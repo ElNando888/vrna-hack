@@ -35,6 +35,47 @@
 static char UNUSED rcsid[] = "$Id: RNAfold.c,v 1.25 2009/02/24 14:22:21 ivo Exp $";
 
 /*--------------------------------------------------------------------------*/
+/* Motifs/ligands related stuff                                             */
+/* Temporary located here, some of the following code will probably end up  */
+/* in (a) separate file(S)                                                  */
+/*--------------------------------------------------------------------------*/
+
+typedef struct _ligand {
+  /* static fields */
+  const char *name;
+  FLT_OR_DBL Kd;
+  /* runtime */
+  FLT_OR_DBL conc;        /* in micromolars */ 
+  int        deltaG;      /* in dcal/mol    */
+} ligand;
+
+typedef struct _motif {
+  /* static fields */
+  const char *name;
+  unsigned   num_segments;
+  const char **segment;
+  int        intrinsic;   /* in dcal/mol */
+  int        lig_index;
+  /* runtime */
+  int        **occur;
+} motif;
+
+
+ligand known_ligands[] = {
+  {"FMN", 3.0, 0., 0}
+};
+
+enum {
+  _FMN,
+  _NONE = -1
+};
+
+motif  known_motifs[] = {
+  {"FMN aptamer", 2, (const char *[]){"AGGAUA","GAAGG"}, 0, _FMN, NULL},
+  {"Sarcin-ricin (example)", 2, (const char*[]){"CCAGUA","GAACA"}, -100, _NONE, NULL}
+};
+
+/*--------------------------------------------------------------------------*/
 
 int main(int argc, char *argv[]){
   struct        RNAfold_args_info args_info;
