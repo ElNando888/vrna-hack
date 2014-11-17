@@ -87,9 +87,8 @@ int set_ligand( const char* lname, FLT_OR_DBL concentration )
     ligand* kli = known_ligands+i;
     if (strcmp(lname, kli->name)!=0) continue;
     kli->conc = concentration;
-    /* FIXME: -0.6 is not exactly -RT ... */
     kli->deltaG = 100. * (_RT * log(concentration / kli->Kd));
-    fprintf(stderr,"Ligand %s, dG %d dcal/mol\n", kli->name, kli->deltaG);
+    if (0) fprintf(stderr,"Ligand %s, dG %d dcal/mol\n", kli->name, kli->deltaG);
     return i;
   }
   return -1;
@@ -99,7 +98,7 @@ int set_ligand( const char* lname, FLT_OR_DBL concentration )
 /* TODO: retrieve these from a file */
 motif  known_motifs[] = {
   {"FMN aptamer", 2, (const char *[]){"AGGAUA","GAAGG"}, (int[]){0,0}, (int[]){6,5}, 0, _FMN, NULL},
-  {"Sarcin-ricin (example)", 2, (const char*[]){"CCAGUA","GAACA"}, (int[]){0,0}, (int[]){6,5}, -270, _NONE, NULL}
+  {"Sarcin-ricin (example)", 2, (const char*[]){"CCAGUA","GAACA"}, (int[]){0,0}, (int[]){6,5}, -250, _NONE, NULL}
 };
 
 int num_motifs = sizeof(known_motifs) / sizeof(motif);

@@ -4,3 +4,9 @@ as possible (correct MFEs and partition functions)
 See README.orig and http://www.tbi.univie.ac.at/RNA/ for details about the
 original package.
 
+-----------------------------------------------------------------------------
+Example:
+$ Progs/RNAfold --ligand FMN:200
+
+will fold sequences assuming 200 uM of FMN in the solution.
+
