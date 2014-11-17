@@ -72,6 +72,30 @@ enum {
   _NONE = -1
 };
 
+int num_ligands = sizeof(known_ligands) / sizeof(ligand);
+
+#if 1
+#define _RT (-(temperature+K0)*GASCONST/1000.)
+#else
+#define _RT -0.6
+#endif
+
+int set_ligand( const char* lname, FLT_OR_DBL concentration )
+{
+  int i;
+  for (i=0; i < num_ligands; i++) {
+    ligand* kli = known_ligands+i;
+    if (strcmp(lname, kli->name)!=0) continue;
+    kli->conc = concentration;
+    /* FIXME: -0.6 is not exactly -RT ... */
+    kli->deltaG = 100. * (_RT * log(concentration / kli->Kd));
+    fprintf(stderr,"Ligand %s, dG %d dcal/mol\n", kli->name, kli->deltaG);
+    return i;
+  }
+  return -1;
+}
+
+
 /* TODO: retrieve these from a file */
 motif  known_motifs[] = {
   {"FMN aptamer", 2, (const char *[]){"AGGAUA","GAAGG"}, (int[]){0,0}, (int[]){6,5}, 0, _FMN, NULL},
@@ -128,7 +152,7 @@ void detect_motifs(const char *sequence)
             known_motifs[i].occur[k] = (int*)calloc(1, sizeof(int));
           }
         }
-        if (1) fprintf(stderr,"%s[%d] found at %d\n", known_motifs[i].name, j, ofs+1);
+        if (0) fprintf(stderr,"%s[%d] found at %d\n", known_motifs[i].name, j, ofs+1);
         add_list(known_motifs[i].occur[j], ofs+1 + known_motifs[i].s_ofs[j]);
       }
     }
@@ -150,7 +174,7 @@ void std_eilcb(int* fe, int n1, int n2, int type, int type_2, int si1, int sj1, 
         if (kmi->lig_index >= 0) {
           (*fe) += known_ligands[kmi->lig_index].deltaG;
         }
-        fprintf(stderr, "%s at %d+%d\n", kmi->name, ii, qq);
+        if (0) fprintf(stderr, "%s at %d+%d\n", kmi->name, ii, qq);
         return;
       }
     }
@@ -161,7 +185,7 @@ void std_eilcb(int* fe, int n1, int n2, int type, int type_2, int si1, int sj1, 
         if (kmi->lig_index >= 0) {
           (*fe) += known_ligands[kmi->lig_index].deltaG;
         }
-        fprintf(stderr, "%s at %d+%d\n", kmi->name, qq, ii);
+        if (0) fprintf(stderr, "%s at %d+%d\n", kmi->name, qq, ii);
         return;
       }
     }
@@ -302,6 +326,23 @@ int main(int argc, char *argv[]){
   }
   if(args_info.layout_type_given)
     rna_plot_type = args_info.layout_type_arg;
+  /* Ligands */
+  if(args_info.ligand_given){
+    int i;
+    for (i = 0; i < args_info.ligand_given; ++i) {
+      FLT_OR_DBL cc;
+      char *p;
+      char *buf = strdup(args_info.ligand_arg[i]);
+      while(p=strchr(args_info.ligand_arg[i],':')) (*p) = ' ';
+      if (sscanf(args_info.ligand_arg[i], "%s %lf", buf, &cc) != 2) {
+        nrerror("Invalid ligand input");
+      }
+      if (set_ligand(buf, cc) < 0) {
+        warn_user("Unknown ligand");
+      }
+      free(buf);
+    }
+  }
 
   /* free allocated memory of command line data structure */
   RNAfold_cmdline_parser_free (&args_info);
