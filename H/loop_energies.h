@@ -369,6 +369,10 @@ INLINE  PRIVATE int E_IntLoop(int n1, int n2, int type, int type_2, int si1, int
       if (type>2) energy += P->TerminalAU;
       if (type_2>2) energy += P->TerminalAU;
     }
+    /* check for application-driven tunings */
+    if (P->eilcb) {
+      (*(P->eilcb))(&energy, n1, n2, type, type_2, si1, sj1, sp1, sq1, P);
+    }
     return energy;
   }
   else {                            /* interior loop */
@@ -405,6 +409,10 @@ INLINE  PRIVATE int E_IntLoop(int n1, int n2, int type, int type_2, int si1, int
       energy += MIN2(MAX_NINIO, (nl-ns)*P->ninio[2]);
 
       energy += P->mismatchI[type][si1][sj1] + P->mismatchI[type_2][sq1][sp1];
+    }
+    /* check for application-driven tunings */
+    if (P->eilcb) {
+      (*(P->eilcb))(&energy, n1, n2, type, type_2, si1, sj1, sp1, sq1, P);
     }
   }
   return energy;
@@ -529,6 +537,10 @@ INLINE  PRIVATE double exp_E_IntLoop(int u1, int u2, int type, int type2, short 
         if (type>2) z *= P->expTermAU;
         if (type2>2) z *= P->expTermAU;
       }
+      /* check for application-driven tunings */
+      if (P->eeilcb) {
+        (*(P->eeilcb))(&z, u1, u2, type, type2, si1, sj1, sp1, sq1, P);
+      }
       return z;
     }
     else if (us==1) {
@@ -556,7 +568,11 @@ INLINE  PRIVATE double exp_E_IntLoop(int u1, int u2, int type, int type2, short 
     }
     /* generic interior loop (no else here!)*/
     z = P->expinternal[ul+us] * P->expmismatchI[type][si1][sj1] * P->expmismatchI[type2][sq1][sp1];
-    return z * P->expninio[2][ul-us];
+    /* check for application-driven tunings */
+    if (P->eeilcb) {
+      (*(P->eeilcb))(&z, u1, u2, type, type2, si1, sj1, sp1, sq1, P);
+    }
+    z *= P->expninio[2][ul-us];
 
   }
   return z;
