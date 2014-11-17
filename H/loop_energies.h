@@ -154,6 +154,8 @@ INLINE  PRIVATE int E_IntLoop(int n1,
                               int sj1,
                               int sp1,
                               int sq1,
+                              int ii,
+                              int qq,
                               paramT *P);
 
 
@@ -311,6 +313,8 @@ INLINE  PRIVATE double  exp_E_IntLoop(int u1,
                                       short sj1,
                                       short sp1,
                                       short sq1,
+                                      int ii,
+                                      int qq,
                                       pf_paramT *P);
 
 
@@ -350,7 +354,8 @@ INLINE  PRIVATE int E_Hairpin(int size, int type, int si1, int sj1, const char *
   return energy;
 }
 
-INLINE  PRIVATE int E_IntLoop(int n1, int n2, int type, int type_2, int si1, int sj1, int sp1, int sq1, paramT *P){
+INLINE  PRIVATE int E_IntLoop(int n1, int n2, int type, int type_2, int si1, int sj1, int sp1, int sq1, 
+                              int ii, int qq, paramT *P){
   /* compute energy of degree 2 loop (stack bulge or interior) */
   int nl, ns, energy;
   energy = INF;
@@ -370,8 +375,8 @@ INLINE  PRIVATE int E_IntLoop(int n1, int n2, int type, int type_2, int si1, int
       if (type_2>2) energy += P->TerminalAU;
     }
     /* check for application-driven tunings */
-    if (P->eilcb) {
-      (*(P->eilcb))(&energy, n1, n2, type, type_2, si1, sj1, sp1, sq1, P);
+    if (P && P->eilcb) {
+      (*(P->eilcb))(&energy, n1, n2, type, type_2, si1, sj1, sp1, sq1, ii, qq, P);
     }
     return energy;
   }
@@ -411,8 +416,8 @@ INLINE  PRIVATE int E_IntLoop(int n1, int n2, int type, int type_2, int si1, int
       energy += P->mismatchI[type][si1][sj1] + P->mismatchI[type_2][sq1][sp1];
     }
     /* check for application-driven tunings */
-    if (P->eilcb) {
-      (*(P->eilcb))(&energy, n1, n2, type, type_2, si1, sj1, sp1, sq1, P);
+    if (P && P->eilcb) {
+      (*(P->eilcb))(&energy, n1, n2, type, type_2, si1, sj1, sp1, sq1, ii, qq, P);
     }
   }
   return energy;
@@ -517,7 +522,8 @@ INLINE  PRIVATE double exp_E_Hairpin(int u, int type, short si1, short sj1, cons
   return q;
 }
 
-INLINE  PRIVATE double exp_E_IntLoop(int u1, int u2, int type, int type2, short si1, short sj1, short sp1, short sq1, pf_paramT *P){
+INLINE  PRIVATE double exp_E_IntLoop(int u1, int u2, int type, int type2, short si1, short sj1, short sp1, short sq1, 
+                                     int ii, int qq, pf_paramT *P){
   int ul, us, no_close = 0;
   double z = 0.;
 
@@ -538,8 +544,8 @@ INLINE  PRIVATE double exp_E_IntLoop(int u1, int u2, int type, int type2, short 
         if (type2>2) z *= P->expTermAU;
       }
       /* check for application-driven tunings */
-      if (P->eeilcb) {
-        (*(P->eeilcb))(&z, u1, u2, type, type2, si1, sj1, sp1, sq1, P);
+      if (P && P->eeilcb) {
+        (*(P->eeilcb))(&z, u1, u2, type, type2, si1, sj1, sp1, sq1, ii, qq, P);
       }
       return z;
     }
@@ -569,8 +575,8 @@ INLINE  PRIVATE double exp_E_IntLoop(int u1, int u2, int type, int type2, short 
     /* generic interior loop (no else here!)*/
     z = P->expinternal[ul+us] * P->expmismatchI[type][si1][sj1] * P->expmismatchI[type2][sq1][sp1];
     /* check for application-driven tunings */
-    if (P->eeilcb) {
-      (*(P->eeilcb))(&z, u1, u2, type, type2, si1, sj1, sp1, sq1, P);
+    if (P && P->eeilcb) {
+      (*(P->eeilcb))(&z, u1, u2, type, type2, si1, sj1, sp1, sq1, ii, qq, P);
     }
     z *= P->expninio[2][ul-us];
 

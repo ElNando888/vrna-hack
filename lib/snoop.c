@@ -233,7 +233,7 @@ snoopT alisnoopfold(const char **s1, const char **s2,
             type4 = pair[Sali1[s][k]][Sali2[s][l]];
             if (type4==0) type4=7;
             E += E_IntLoop(i-k-1, l-j-1, type4, rtype[type[s]],
-                           Sali1[s][k+1], Sali2[s][l-1], Sali1[s][i-1], Sali2[s][j+1],P);
+                           Sali1[s][k+1], Sali2[s][l-1], Sali1[s][i-1], Sali2[s][j+1], 0, 0, P);
           }
           c[i][j] = MIN2(c[i][j], c[k][l] + E);
           r[i][j] = MIN2(r[i][j], r[k][l] + E);
@@ -516,7 +516,7 @@ PRIVATE char *alisnoop_backtrack(int i, int j, const char ** snoseq, int *Duplex
           for (s=LE=0; s<n_seq; s++) {
             type4 = pair[Sali1[s][k]][Sali2[s][l]];
             if (type4==0) type4=7;
-            LE += E_IntLoop(i-k-1, l-j-1, type4, rtype[type[s]], Sali1[s][k+1], Sali2[s][l-1], Sali1[s][i-1], Sali2[s][j+1],P);
+            LE += E_IntLoop(i-k-1, l-j-1, type4, rtype[type[s]], Sali1[s][k+1], Sali2[s][l-1], Sali1[s][i-1], Sali2[s][j+1], 0, 0, P);
           }
           if (E == r[k][l]+LE) {
             traced=1; 
@@ -622,7 +622,7 @@ PRIVATE char *alisnoop_backtrack(int i, int j, const char ** snoseq, int *Duplex
           for (s=LE=0; s<n_seq; s++) {
             type4 = pair[Sali1[s][k]][Sali2[s][l]];
             if (type4==0) type4=7;
-            LE += E_IntLoop(i-k-1, l-j-1, type4, rtype[type[s]], Sali1[s][k+1], Sali2[s][l-1], Sali1[s][i-1], Sali2[s][j+1],P);
+            LE += E_IntLoop(i-k-1, l-j-1, type4, rtype[type[s]], Sali1[s][k+1], Sali2[s][l-1], Sali1[s][i-1], Sali2[s][j+1], 0, 0, P);
           }
           if (E == c[k][l]+LE) {
             traced=1; 
@@ -822,22 +822,22 @@ void Lsnoop_subopt(const char *s1, const char *s2, int delta, int w,
       if(j<n2 && i>1){
         type2=pair[S1[i-1]][S2[j+1]];
               if(type2>0){
-          lc[idx][j]=MIN2(lc[idx_1][j+1]+E_IntLoop(0,0,type2, rtype[type],SS1[i], SS2[j], SS1[i-1], SS2[j+1], P)+2*penalty, lc[idx][j]);
-          lr[idx][j]=MIN2(lr[idx_1][j+1]+E_IntLoop(0,0,type2, rtype[type],SS1[i], SS2[j], SS1[i-1], SS2[j+1], P)+2*penalty, lr[idx][j]);
+          lc[idx][j]=MIN2(lc[idx_1][j+1]+E_IntLoop(0,0,type2, rtype[type],SS1[i], SS2[j], SS1[i-1], SS2[j+1], 0, 0, P)+2*penalty, lc[idx][j]);
+          lr[idx][j]=MIN2(lr[idx_1][j+1]+E_IntLoop(0,0,type2, rtype[type],SS1[i], SS2[j], SS1[i-1], SS2[j+1], 0, 0, P)+2*penalty, lr[idx][j]);
               }
       }
       if(j<n2-1 && i>2){
         type2=pair[S1[i-2]][S2[j+2]];
         if(type2>0 ){
-          lc[idx][j]=MIN2(lc[idx_2][j+2]+E_IntLoop(1,1,type2, rtype[type],SS1[i-1], SS2[j+1], SS1[i-1], SS2[j+1], P)+4*penalty, lc[idx][j]);
-          lr[idx][j]=MIN2(lr[idx_2][j+2]+E_IntLoop(1,1,type2, rtype[type],SS1[i-1], SS2[j+1], SS1[i-1], SS2[j+1], P)+4*penalty, lr[idx][j]);
+          lc[idx][j]=MIN2(lc[idx_2][j+2]+E_IntLoop(1,1,type2, rtype[type],SS1[i-1], SS2[j+1], SS1[i-1], SS2[j+1], 0, 0, P)+4*penalty, lc[idx][j]);
+          lr[idx][j]=MIN2(lr[idx_2][j+2]+E_IntLoop(1,1,type2, rtype[type],SS1[i-1], SS2[j+1], SS1[i-1], SS2[j+1], 0, 0, P)+4*penalty, lr[idx][j]);
         }
       }
       if(j<n2-2 && i>3){
         type2 = pair[S1[i-3]][S2[j+3]];
         if(type2>0){
-          lc[idx][j]=MIN2(lc[idx_3][j+3]+E_IntLoop(2,2,type2, rtype[type],SS1[i-2], SS2[j+2], SS1[i-1], SS2[j+1], P)+6*penalty,lc[idx][j]);
-          lr[idx][j]=MIN2(lr[idx_3][j+3]+E_IntLoop(2,2,type2, rtype[type],SS1[i-2], SS2[j+2], SS1[i-1], SS2[j+1], P)+6*penalty,lr[idx][j]);
+          lc[idx][j]=MIN2(lc[idx_3][j+3]+E_IntLoop(2,2,type2, rtype[type],SS1[i-2], SS2[j+2], SS1[i-1], SS2[j+1], 0, 0, P)+6*penalty,lc[idx][j]);
+          lr[idx][j]=MIN2(lr[idx_3][j+3]+E_IntLoop(2,2,type2, rtype[type],SS1[i-2], SS2[j+2], SS1[i-1], SS2[j+1], 0, 0, P)+6*penalty,lr[idx][j]);
               }
       }
       /**
@@ -970,24 +970,24 @@ void Lsnoop_subopt_list(const char *s1, const char *s2, int delta, int w,
       /* type2=pair[S1[i-1]][S2[j+1]]; */
         type2=lpair[idx_1][j+1];
         if(type2>0 ){
-          lc[idx][j]=MIN2(lc[idx_1][j+1]+E_IntLoop(0,0,type2, rtype[type],SS1[i], SS2[j], SS1[i-1], SS2[j+1], P)+2*penalty, lc[idx][j]);
-          lr[idx][j]=MIN2(lr[idx_1][j+1]+E_IntLoop(0,0,type2, rtype[type],SS1[i], SS2[j], SS1[i-1], SS2[j+1], P)+2*penalty, lr[idx][j]);
+          lc[idx][j]=MIN2(lc[idx_1][j+1]+E_IntLoop(0,0,type2, rtype[type],SS1[i], SS2[j], SS1[i-1], SS2[j+1], 0, 0, P)+2*penalty, lc[idx][j]);
+          lr[idx][j]=MIN2(lr[idx_1][j+1]+E_IntLoop(0,0,type2, rtype[type],SS1[i], SS2[j], SS1[i-1], SS2[j+1], 0, 0, P)+2*penalty, lr[idx][j]);
         }
         /* } */
         /*       if(j<n2-1 && i>2){ */
         /* type2=pair[S1[i-2]][S2[j+2]]; */
         type2=lpair[idx_2][j+2];
         if(type2>0 ){
-          lc[idx][j]=MIN2(lc[idx_2][j+2]+E_IntLoop(1,1,type2, rtype[type],SS1[i-1], SS2[j+1], SS1[i-1], SS2[j+1], P), lc[idx][j]);
-          lr[idx][j]=MIN2(lr[idx_2][j+2]+E_IntLoop(1,1,type2, rtype[type],SS1[i-1], SS2[j+1], SS1[i-1], SS2[j+1], P), lr[idx][j]);
+          lc[idx][j]=MIN2(lc[idx_2][j+2]+E_IntLoop(1,1,type2, rtype[type],SS1[i-1], SS2[j+1], SS1[i-1], SS2[j+1], 0, 0, P), lc[idx][j]);
+          lr[idx][j]=MIN2(lr[idx_2][j+2]+E_IntLoop(1,1,type2, rtype[type],SS1[i-1], SS2[j+1], SS1[i-1], SS2[j+1], 0, 0, P), lr[idx][j]);
           /*         } */
       }
         /*       if(j<n2-2 && i>3){ */
         /* type2 = pair[S1[i-3]][S2[j+3]]; */
         type2 =lpair[idx_3][j+3];
         if(type2>0 ){
-          lc[idx][j]=MIN2(lc[idx_3][j+3]+E_IntLoop(2,2,type2, rtype[type],SS1[i-2], SS2[j+2], SS1[i-1], SS2[j+1], P)+6*penalty,lc[idx][j]);
-          lr[idx][j]=MIN2(lr[idx_3][j+3]+E_IntLoop(2,2,type2, rtype[type],SS1[i-2], SS2[j+2], SS1[i-1], SS2[j+1], P)+6*penalty,lr[idx][j]);
+          lc[idx][j]=MIN2(lc[idx_3][j+3]+E_IntLoop(2,2,type2, rtype[type],SS1[i-2], SS2[j+2], SS1[i-1], SS2[j+1], 0, 0, P)+6*penalty,lc[idx][j]);
+          lr[idx][j]=MIN2(lr[idx_3][j+3]+E_IntLoop(2,2,type2, rtype[type],SS1[i-2], SS2[j+2], SS1[i-1], SS2[j+1], 0, 0, P)+6*penalty,lr[idx][j]);
           /*         } */
       }
       /* min_colonne=MIN2(lr[idx][j]+(type>2?P->TerminalAU:0)+P->dangle3[rtype[type]][SS1[i+1]]+P->dangle5[rtype[type]][SS2[j-1]], min_colonne); */
@@ -1216,7 +1216,7 @@ snoopT snoopfold(const char *s1, const char *s2,
           type2 = pair[S1[k]][S2[l]];
           if (!type2) continue;
           E = E_IntLoop(i-k-1, l-j-1, type2, rtype[type],
-                        SS1[k+1], SS2[l-1], SS1[i-1], SS2[j+1],P);
+                        SS1[k+1], SS2[l-1], SS1[i-1], SS2[j+1], 0, 0, P);
           c[i][j] = MIN2(c[i][j], c[k][l]+E+(i-k+l-j)*penalty);
           r[i][j] = MIN2(r[i][j], r[k][l]+E+(i-k+l-j)*penalty);
         }
@@ -1358,7 +1358,7 @@ PRIVATE int snoopfold_XS_fill(const char *s1, const char *s2, const int **access
           type2 = pair[S1[k]][S2[l]];
           if (!type2) continue;
           E = E_IntLoop(i-k-1, l-j-1, type2, rtype[type],
-                        SS1[k+1], SS2[l-1], SS1[i-1], SS2[j+1],P);
+                        SS1[k+1], SS2[l-1], SS1[i-1], SS2[j+1], 0, 0, P);
           c_fill[i][j] = MIN2(c_fill[i][j], c_fill[k][l]+E+di[i-k]);
           r_fill[i][j] = MIN2(r_fill[i][j], r_fill[k][l]+E+di[i-k]);
         }
@@ -1699,7 +1699,7 @@ PRIVATE char *snoop_backtrack(int i, int j, const char* snoseq,
           type2 = pair[S1[k]][S2[l]];
           if (!type2) continue;
           LE = E_IntLoop(i-k-1, l-j-1, type2, rtype[type],
-                         SS1[k+1], SS2[l-1], SS1[i-1], SS2[j+1],P);
+                         SS1[k+1], SS2[l-1], SS1[i-1], SS2[j+1], 0, 0, P);
           if (E == r[k][l]+LE+(i-k+l-j)*penalty) {
             traced=1; 
             i=k; j=l;
@@ -1785,7 +1785,7 @@ PRIVATE char *snoop_backtrack(int i, int j, const char* snoseq,
           type2 = pair[S1[k]][S2[l]];
           if (!type2) continue;
           LE = E_IntLoop(i-k-1, l-j-1, type2, rtype[type],
-                         SS1[k+1], SS2[l-1], SS1[i-1], SS2[j+1],P);
+                         SS1[k+1], SS2[l-1], SS1[i-1], SS2[j+1], 0, 0, P);
           if (E == c[k][l]+LE+(i-k+l-j)*penalty) {
             traced=1; 
             i=k; j=l;
@@ -1982,19 +1982,19 @@ void Lsnoop_subopt_list_XS(const char *s1, const char *s2,  const int **access_s
       /* type2=pair[S1[i-1]][S2[j+1]]; */
         type2=lpair[idx_1][j+1];
         if(type2>0 ){
-          lc[idx][j]=MIN2(lc[idx_1][j+1]+E_IntLoop(0,0,type2, rtype[type],SS1[i], SS2[j], SS1[i-1], SS2[j+1], P)+di1, lc[idx][j]);
-          lr[idx][j]=MIN2(lr[idx_1][j+1]+E_IntLoop(0,0,type2, rtype[type],SS1[i], SS2[j], SS1[i-1], SS2[j+1], P)+di1, lr[idx][j]);
+          lc[idx][j]=MIN2(lc[idx_1][j+1]+E_IntLoop(0,0,type2, rtype[type],SS1[i], SS2[j], SS1[i-1], SS2[j+1], 0, 0, P)+di1, lc[idx][j]);
+          lr[idx][j]=MIN2(lr[idx_1][j+1]+E_IntLoop(0,0,type2, rtype[type],SS1[i], SS2[j], SS1[i-1], SS2[j+1], 0, 0, P)+di1, lr[idx][j]);
         }
         type2=lpair[idx_2][j+2];
         if(type2>0 ){
-          lc[idx][j]=MIN2(lc[idx_2][j+2]+E_IntLoop(1,1,type2, rtype[type],SS1[i-1], SS2[j+1], SS1[i-1], SS2[j+1], P)+di2, lc[idx][j]);
-          lr[idx][j]=MIN2(lr[idx_2][j+2]+E_IntLoop(1,1,type2, rtype[type],SS1[i-1], SS2[j+1], SS1[i-1], SS2[j+1], P)+di2, lr[idx][j]);
+          lc[idx][j]=MIN2(lc[idx_2][j+2]+E_IntLoop(1,1,type2, rtype[type],SS1[i-1], SS2[j+1], SS1[i-1], SS2[j+1], 0, 0, P)+di2, lc[idx][j]);
+          lr[idx][j]=MIN2(lr[idx_2][j+2]+E_IntLoop(1,1,type2, rtype[type],SS1[i-1], SS2[j+1], SS1[i-1], SS2[j+1], 0, 0, P)+di2, lr[idx][j]);
          
       }
         type2 =lpair[idx_3][j+3];
         if(type2>0 ){
-          lc[idx][j]=MIN2(lc[idx_3][j+3]+E_IntLoop(2,2,type2, rtype[type],SS1[i-2], SS2[j+2], SS1[i-1], SS2[j+1], P)+di3,lc[idx][j]);
-          lr[idx][j]=MIN2(lr[idx_3][j+3]+E_IntLoop(2,2,type2, rtype[type],SS1[i-2], SS2[j+2], SS1[i-1], SS2[j+1], P)+di3,lr[idx][j]);
+          lc[idx][j]=MIN2(lc[idx_3][j+3]+E_IntLoop(2,2,type2, rtype[type],SS1[i-2], SS2[j+2], SS1[i-1], SS2[j+1], 0, 0, P)+di3,lc[idx][j]);
+          lr[idx][j]=MIN2(lr[idx_3][j+3]+E_IntLoop(2,2,type2, rtype[type],SS1[i-2], SS2[j+2], SS1[i-1], SS2[j+1], 0, 0, P)+di3,lr[idx][j]);
 
       }
       int bla;
@@ -2227,7 +2227,7 @@ snoopT snoopfold_XS(const char *s1, const char *s2, const int **access_s1, const
            if (abs((p-a)-(b-q)) >= ASS ) continue; 
            type2 = pair[S1[p]][S2[q]]; 
            if (!type2) continue; 
-           E = E_IntLoop(p-a-1, b-q-1, type2, rtype[type],SS1[a+1], SS2[b-1], SS1[p-1], SS2[q+1],P); 
+           E = E_IntLoop(p-a-1, b-q-1, type2, rtype[type],SS1[a+1], SS2[b-1], SS1[p-1], SS2[q+1], 0, 0, P); 
            c[a][b] = MIN2(c[a][b], c[p][q]+E); 
            r[a][b] = MIN2(r[a][b], r[p][q]+E); 
          }
@@ -2311,7 +2311,7 @@ PRIVATE char *snoop_backtrack_XS(int i, int j, const char* snoseq,
           type2 = pair[S1[k]][S2[l]];
           if (!type2) continue;
           LE = E_IntLoop(k-i-1, j-l-1, type2, rtype[type],
-                         SS1[i+1], SS2[j-1], SS1[k-1], SS2[l+1],P);
+                         SS1[i+1], SS2[j-1], SS1[k-1], SS2[l+1], 0, 0, P);
           if (E == c[k][l]+LE) {
             traced=1; 
             i=k; j=l;
@@ -2398,7 +2398,7 @@ PRIVATE char *snoop_backtrack_XS(int i, int j, const char* snoseq,
           type2 = pair[S1[k]][S2[l]];
           if (!type2) continue;
           LE = E_IntLoop(k-i-1, j-l-1, type2, rtype[type],
-                         SS1[i+1], SS2[j-1], SS1[k-1], SS2[l+1],P);
+                         SS1[i+1], SS2[j-1], SS1[k-1], SS2[l+1], 0, 0, P);
           if (E == r[k][l]+LE) {
             traced=1; 
             i=k; j=l;

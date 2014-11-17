@@ -122,7 +122,7 @@ PRIVATE duplexT duplexfold_cu(const char *s1, const char *s2, int clean_up){
           type2 = pair[S1[k]][S2[l]];
           if (!type2) continue;
           E = E_IntLoop(i-k-1, l-j-1, type2, rtype[type],
-                            SS1[k+1], SS2[l-1], SS1[i-1], SS2[j+1], P);
+                            SS1[k+1], SS2[l-1], SS1[i-1], SS2[j+1], 0, 0, P);
           c[i][j] = MIN2(c[i][j], c[k][l]+E);
         }
       }
@@ -236,7 +236,7 @@ PRIVATE char *backtrack(int i, int j) {
         type2 = pair[S1[k]][S2[l]];
         if (!type2) continue;
         LE = E_IntLoop(i-k-1, l-j-1, type2, rtype[type],
-                       SS1[k+1], SS2[l-1], SS1[i-1], SS2[j+1], P);
+                       SS1[k+1], SS2[l-1], SS1[i-1], SS2[j+1], 0, 0, P);
         if (E == c[k][l]+LE) {
           traced=1;
           i=k; j=l;
@@ -340,7 +340,7 @@ PRIVATE duplexT aliduplexfold_cu(const char *s1[], const char *s2[], int clean_u
             type2 = pair[S1[s][k]][S2[s][l]];
             if (type2==0) type2=7;
             E += E_IntLoop(i-k-1, l-j-1, type2, rtype[type[s]],
-                           S1[s][k+1], S2[s][l-1], S1[s][i-1], S2[s][j+1], P);
+                           S1[s][k+1], S2[s][l-1], S1[s][i-1], S2[s][j+1], 0, 0, P);
           }
           c[i][j] = MIN2(c[i][j], c[k][l]+E);
         }
@@ -499,7 +499,7 @@ PRIVATE char *alibacktrack(int i, int j, const short **S1, const short **S2) {
           type2 = pair[S1[s][k]][S2[s][l]];
           if (type2==0) type2=7;
           LE += E_IntLoop(i-k-1, l-j-1, type2, rtype[type[s]],
-                           S1[s][k+1], S2[s][l-1], S1[s][i-1], S2[s][j+1], P);
+                           S1[s][k+1], S2[s][l-1], S1[s][i-1], S2[s][j+1], 0, 0, P);
         }
         if (E == c[k][l]+LE) {
           traced=1;

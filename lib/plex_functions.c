@@ -110,7 +110,7 @@ PRIVATE void  duplexfold_XS(const char *s1,
             if (p - k + l - q - 2 > MAXLOOP) break;
             type3 = ptype[indx[q] + p];
             if(!type3) continue;
-            E = E_IntLoop(p - k - 1, l - q - 1, type2, rtype[type3], SS1[k + 1], SS1[l - 1], SS1[p - 1], SS1[q + 1], P);
+            E = E_IntLoop(p - k - 1, l - q - 1, type2, rtype[type3], SS1[k + 1], SS1[l - 1], SS1[p - 1], SS1[q + 1], k+1, q+1, P);
             for(j = MAX2(i + 4, l - max_interaction_length + 1); j <= q; j++){
               type = ptype[indx[j]+i];
               if (type){
@@ -209,7 +209,7 @@ PRIVATE char *backtrack_XS(int k, int l, const int i, const int j, const int max
         if (p-k+l-q-2>MAXLOOP) break;
         type2=ptype[indx[q]+p];
         if (!type2) continue;
-         LE = E_IntLoop(p-k-1, l-q-1, type, rtype[type2], SS1[k+1], SS1[l-1], SS1[p-1], SS1[q+1], P);
+         LE = E_IntLoop(p-k-1, l-q-1, type, rtype[type2], SS1[k+1], SS1[l-1], SS1[p-1], SS1[q+1], k+1, q+1, P);
          if (E == c3[j-11][max_interaction_length-i+p-1][q-j]+LE) {
           traced=1;
            k=p; l=q;

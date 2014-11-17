@@ -1052,7 +1052,7 @@ scan_interval(int i, int j, int array_flag, STATE * state)
               if(!type_2) continue;
               u2 = k-1 + j-q;
               if(u1+u2>MAXLOOP) continue;
-              tmpE = E_IntLoop(u1, u2, type, type_2, S1[l+1], S1[k-1], S1[p-1], S1[q+1], P);
+              tmpE = E_IntLoop(u1, u2, type, type_2, S1[l+1], S1[k-1], S1[p-1], S1[q+1], l+1, q+1, P);
               if(c[kl] + c[indx[q]+p] + tmpE + best_energy <= threshold){
                 /* ok, similar to the hairpin stuff, we add new states onto the stack R */
                 /* but in contrast to the hairpin decomposition, we have to add two new */
@@ -1326,7 +1326,7 @@ repeat(int i, int j, STATE * state, int part_energy, int temp_energy)
       new_interval = make_interval(i+1, j-1, 2);
       push(new_state->Intervals, new_interval);
       if(SAME_STRAND(i,i+1) && SAME_STRAND(j-1,j))
-        energy = E_IntLoop(0, 0, type, rtype[type_2],S1[i+1],S1[j-1],S1[i+1],S1[j-1], P);
+        energy = E_IntLoop(0, 0, type, rtype[type_2],S1[i+1],S1[j-1],S1[i+1],S1[j-1], i+1, j-1, P);
 
       new_state->partial_energy += part_energy;
       new_state->partial_energy += energy;
@@ -1355,7 +1355,7 @@ repeat(int i, int j, STATE * state, int part_energy, int temp_energy)
 
       if (SAME_STRAND(i,p) && SAME_STRAND(q,j)) {
         energy = E_IntLoop(p-i-1, j-q-1, type, rtype[type_2],
-                            S1[i+1],S1[j-1],S1[p-1],S1[q+1], P);
+                            S1[i+1],S1[j-1],S1[p-1],S1[q+1], i+1, q+1, P);
 
         new = energy + c[indx[q]+p];
 

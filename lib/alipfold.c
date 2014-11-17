@@ -359,7 +359,7 @@ PRIVATE void alipf_linear(const char **sequences, char *structure)
               qloop *= exp_E_IntLoop( u1, a2s[s][j-1]-a2s[s][l],
                                   type[s], type_2, S3[s][i],
                                   S5[s][j], S5[s][k], S3[s][l],
-                                  pf_params
+                                  0, 0, pf_params
                                 );
             }
             qbt1 += qb[my_iindx[k]-l] * qloop * scale[k-i+j-l];
@@ -525,7 +525,7 @@ PRIVATE void alipf_create_bppm(const char **sequences, char *structure, plist **
                             S[s][j+1],
                             S[s][i-1],
                             S[s][(k>1) ? k-1 : n],
-                            S[s][l+1], pf_params);
+                            S[s][l+1], 0, 0, pf_params);
               }
               tmp2 += qb[my_iindx[k] - l] * qloop * scale[ln1+ln2];
             }
@@ -557,7 +557,7 @@ PRIVATE void alipf_create_bppm(const char **sequences, char *structure, plist **
                             S3[s][l],
                             S5[s][k],
                             S5[s][i],
-                            S3[s][j], pf_params);
+                            S3[s][j], 0, 0, pf_params);
               }
               tmp2 += qb[my_iindx[k] - l] * qloop * scale[(k-j-1)+(i-1+n-l)];
             }
@@ -631,7 +631,7 @@ PRIVATE void alipf_create_bppm(const char **sequences, char *structure, plist **
             for (s=0; s<n_seq; s++) {
               int typ;
               typ = pair[S[s][i]][S[s][j]]; if (typ==0) typ=7;
-              qloop *=  exp_E_IntLoop(a2s[s][k-1]-a2s[s][i], a2s[s][j-1]-a2s[s][l], typ, type[s], S3[s][i], S5[s][j], S5[s][k], S3[s][l], pf_params);
+              qloop *=  exp_E_IntLoop(a2s[s][k-1]-a2s[s][i], a2s[s][j-1]-a2s[s][l], typ, type[s], S3[s][i], S5[s][j], S5[s][k], S3[s][l], 0, 0, pf_params);
             }
             pp += probs[ij]*qloop*scale[k-i + j-l];
           }
@@ -1019,7 +1019,7 @@ PUBLIC void alipf_circ(const char **sequences, char *structure){
                 int ln2a=a2s[s][n]-a2s[s][l]+a2s[s][p-1];
                 type_2 = pair[S[s][l]][S[s][k]];
                 if (type_2 == 0) type_2 = 7;
-                qloop *= exp_E_IntLoop(ln2a, ln1a, type_2, type[s], S3[s][l], S5[s][k], S5[s][p], S3[s][q], pf_params);
+                qloop *= exp_E_IntLoop(ln2a, ln1a, type_2, type[s], S3[s][l], S5[s][k], S5[s][p], S3[s][q], 0, 0, pf_params);
               }
               qio += qb[my_iindx[p]-q] * qb[my_iindx[k]-l] * qloop * scale[ln1+ln2];
             }
@@ -1153,7 +1153,7 @@ PRIVATE void backtrack(int i, int j, int n_seq, double *prob) {
           u1 = a2s[s][k-1]-a2s[s][i]/*??*/;
           type_2 = pair[S[s][l]][S[s][k]]; if (type_2 == 0) type_2 = 7;
           qloop *= exp_E_IntLoop(u1, a2s[s][j-1]-a2s[s][l], type[s], type_2,
-                                 S3[s][i], S5[s][j],S5[s][k], S3[s][l], pf_params);
+                                 S3[s][i], S5[s][j],S5[s][k], S3[s][l], 0, 0, pf_params);
         }
         qbt1 += qb[my_iindx[k]-l] * qloop * scale[k-i+j-l];
 

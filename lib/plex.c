@@ -210,7 +210,7 @@ PRIVATE duplexT duplexfold_XS(const char *s1, const char *s2, const int **access
           if (p-k+l-q-2>MAXLOOP) break;
           type3=pair[S1[p]][S2[q]];
           if(!type3) continue;
-          E = E_IntLoop(p-k-1, l-q-1, type2, rtype[type3],SS1[k+1], SS2[l-1], SS1[p-1], SS2[q+1],P);
+          E = E_IntLoop(p-k-1, l-q-1, type2, rtype[type3],SS1[k+1], SS2[l-1], SS1[p-1], SS2[q+1], 0, 0, P);
           c[k][l] = MIN2(c[k][l], c[p][q]+E);
         }
       }
@@ -295,7 +295,7 @@ PRIVATE char *backtrack_XS(int i, int j, const int **access_s1,const int **acces
         if (i-k+l-j-2>MAXLOOP) break;
         type2 = pair[S1[k]][S2[l]];
         if (!type2) continue;
-        LE = E_IntLoop(k-i-1, j-l-1, type, rtype[type2], SS1[i+1], SS2[j-1], SS1[k-1], SS2[l+1],P);
+        LE = E_IntLoop(k-i-1, j-l-1, type, rtype[type2], SS1[i+1], SS2[j-1], SS1[k-1], SS2[l+1], 0, 0, P);
         if (E == c[k][l]+LE) {
           traced=1; 
           i=k; j=l;
@@ -748,8 +748,8 @@ PRIVATE char *fbacktrack_XS(int i, int j, const int** access_s1, const int** acc
       if(type2 && c[i][j]== (c[i - 1][j+1]+P->stack[rtype[type]][type2]+di1+dj1)){
         k=i-1;
         l=j+1;
-        (*dG)+=E_IntLoop(i-k-1, l-j-1, type2, rtype[type],SS1[k+1], SS2[l-1], SS1[i-1], SS2[j+1],P);
-        *dGplex+=E_IntLoop(i-k-1, l-j-1, type2, rtype[type],SS1[k+1], SS2[l-1], SS1[i-1], SS2[j+1],P);
+        (*dG)+=E_IntLoop(i-k-1, l-j-1, type2, rtype[type],SS1[k+1], SS2[l-1], SS1[i-1], SS2[j+1], 0, 0, P);
+        *dGplex+=E_IntLoop(i-k-1, l-j-1, type2, rtype[type],SS1[k+1], SS2[l-1], SS1[i-1], SS2[j+1], 0, 0, P);
         *dGx+=di1;
         *dGy+=dj1;
         st1[i-1] = '(';
@@ -764,8 +764,8 @@ PRIVATE char *fbacktrack_XS(int i, int j, const int** access_s1, const int** acc
       if(type2 && c[i][j]==(c[i - 1][j+2]+P->bulge[1]+P->stack[rtype[type]][type2]+di1+dj2)){
         k=i-1;
         l=j+2;
-        *dG+=E_IntLoop(i-k-1, l-j-1, type2, rtype[type],SS1[k+1], SS2[l-1], SS1[i-1], SS2[j+1],P);
-        *dGplex+=E_IntLoop(i-k-1, l-j-1, type2, rtype[type],SS1[k+1], SS2[l-1], SS1[i-1], SS2[j+1],P);
+        *dG+=E_IntLoop(i-k-1, l-j-1, type2, rtype[type],SS1[k+1], SS2[l-1], SS1[i-1], SS2[j+1], 0, 0, P);
+        *dGplex+=E_IntLoop(i-k-1, l-j-1, type2, rtype[type],SS1[k+1], SS2[l-1], SS1[i-1], SS2[j+1], 0, 0, P);
         *dGx+=di1;
         *dGy+=dj2;
         st1[i-1] = '(';
@@ -780,8 +780,8 @@ PRIVATE char *fbacktrack_XS(int i, int j, const int** access_s1, const int** acc
       if(type2 && c[i][j]==(c[i - 2][j+1]+P->bulge[1]+P->stack[type2][rtype[type]]+di2+dj1)){
         k=i-2;
         l=j+1;
-        *dG+=E_IntLoop(i-k-1, l-j-1, type2, rtype[type],SS1[k+1], SS2[l-1], SS1[i-1], SS2[j+1],P);
-        *dGplex+=E_IntLoop(i-k-1, l-j-1, type2, rtype[type],SS1[k+1], SS2[l-1], SS1[i-1], SS2[j+1],P);
+        *dG+=E_IntLoop(i-k-1, l-j-1, type2, rtype[type],SS1[k+1], SS2[l-1], SS1[i-1], SS2[j+1], 0, 0, P);
+        *dGplex+=E_IntLoop(i-k-1, l-j-1, type2, rtype[type],SS1[k+1], SS2[l-1], SS1[i-1], SS2[j+1], 0, 0, P);
         *dGx+=di2;
         *dGy+=dj1;
         st1[i-1] = '(';
@@ -796,8 +796,8 @@ PRIVATE char *fbacktrack_XS(int i, int j, const int** access_s1, const int** acc
       if(type2 && c[i][j]==(c[i - 2][j+2]+P->int11[type2][rtype[type]][SS1[i-1]][SS2[j+1]]+di2+dj2)){
         k=i-2;
         l=j+2;
-        *dG+=E_IntLoop(i-k-1, l-j-1, type2, rtype[type],SS1[k+1], SS2[l-1], SS1[i-1], SS2[j+1],P);
-        *dGplex+=E_IntLoop(i-k-1, l-j-1, type2, rtype[type],SS1[k+1], SS2[l-1], SS1[i-1], SS2[j+1],P);
+        *dG+=E_IntLoop(i-k-1, l-j-1, type2, rtype[type],SS1[k+1], SS2[l-1], SS1[i-1], SS2[j+1], 0, 0, P);
+        *dGplex+=E_IntLoop(i-k-1, l-j-1, type2, rtype[type],SS1[k+1], SS2[l-1], SS1[i-1], SS2[j+1], 0, 0, P);
         *dGx+=di2;
         *dGy+=dj2;
         st1[i-1] = '(';
@@ -812,8 +812,8 @@ PRIVATE char *fbacktrack_XS(int i, int j, const int** access_s1, const int** acc
       if(type2 && c[i][j]==(c[i - 3][j+3]+P->int22[type2][rtype[type]][SS1[i-2]][SS1[i-1]][SS2[j+1]][SS2[j+2]]+di3+dj3)){
         k=i-3;
         l=j+3;
-        *dG+=E_IntLoop(i-k-1, l-j-1, type2, rtype[type],SS1[k+1], SS2[l-1], SS1[i-1], SS2[j+1],P);
-        *dGplex+=E_IntLoop(i-k-1, l-j-1, type2, rtype[type],SS1[k+1], SS2[l-1], SS1[i-1], SS2[j+1],P);
+        *dG+=E_IntLoop(i-k-1, l-j-1, type2, rtype[type],SS1[k+1], SS2[l-1], SS1[i-1], SS2[j+1], 0, 0, P);
+        *dGplex+=E_IntLoop(i-k-1, l-j-1, type2, rtype[type],SS1[k+1], SS2[l-1], SS1[i-1], SS2[j+1], 0, 0, P);
         *dGx+=di3;
         *dGy+=dj3;
         st1[i-1] = '(';
@@ -828,8 +828,8 @@ PRIVATE char *fbacktrack_XS(int i, int j, const int** access_s1, const int** acc
       if(type2 && c[i][j]==(c[i - 3][j+2]+P->int21[rtype[type]][type2][SS2[j+1]][SS1[i-2]][SS1[i-1]]+di3+dj2)){
         k=i-3;
         l=j+2;
-        *dG+=E_IntLoop(i-k-1, l-j-1, type2, rtype[type],SS1[k+1], SS2[l-1], SS1[i-1], SS2[j+1],P);
-        *dGplex+=E_IntLoop(i-k-1, l-j-1, type2, rtype[type],SS1[k+1], SS2[l-1], SS1[i-1], SS2[j+1],P);
+        *dG+=E_IntLoop(i-k-1, l-j-1, type2, rtype[type],SS1[k+1], SS2[l-1], SS1[i-1], SS2[j+1], 0, 0, P);
+        *dGplex+=E_IntLoop(i-k-1, l-j-1, type2, rtype[type],SS1[k+1], SS2[l-1], SS1[i-1], SS2[j+1], 0, 0, P);
         *dGx+=di3;
         *dGy+=dj2;
         st1[i-1] = '(';
@@ -844,8 +844,8 @@ PRIVATE char *fbacktrack_XS(int i, int j, const int** access_s1, const int** acc
       if(type2 && c[i][j]==(c[i - 2][j+3]+P->int21[type2][rtype[type]][SS1[i-1]][SS2[j+1]][SS2[j+2]]+di2+dj3)){
         k=i-2;
         l=j+3;
-        *dG+=E_IntLoop(i-k-1, l-j-1, type2, rtype[type],SS1[k+1], SS2[l-1], SS1[i-1], SS2[j+1],P);
-        *dGplex+=E_IntLoop(i-k-1, l-j-1, type2, rtype[type],SS1[k+1], SS2[l-1], SS1[i-1], SS2[j+1],P);
+        *dG+=E_IntLoop(i-k-1, l-j-1, type2, rtype[type],SS1[k+1], SS2[l-1], SS1[i-1], SS2[j+1], 0, 0, P);
+        *dGplex+=E_IntLoop(i-k-1, l-j-1, type2, rtype[type],SS1[k+1], SS2[l-1], SS1[i-1], SS2[j+1], 0, 0, P);
         *dGx+=di2;
         *dGy+=dj3;
         st1[i-1] = '(';
@@ -861,8 +861,8 @@ PRIVATE char *fbacktrack_XS(int i, int j, const int** access_s1, const int** acc
                             P->mismatch23I[type2][SS1[i-3]][SS2[j+2]]+P->mismatch23I[rtype[type]][SS2[j+1]][SS1[i-1]]+di4+dj3)){
         k=i-4;
         l=j+3;
-        *dG+=E_IntLoop(i-k-1, l-j-1, type2, rtype[type],SS1[k+1], SS2[l-1], SS1[i-1], SS2[j+1],P);
-        *dGplex+=E_IntLoop(i-k-1, l-j-1, type2, rtype[type],SS1[k+1], SS2[l-1], SS1[i-1], SS2[j+1],P);
+        *dG+=E_IntLoop(i-k-1, l-j-1, type2, rtype[type],SS1[k+1], SS2[l-1], SS1[i-1], SS2[j+1], 0, 0, P);
+        *dGplex+=E_IntLoop(i-k-1, l-j-1, type2, rtype[type],SS1[k+1], SS2[l-1], SS1[i-1], SS2[j+1], 0, 0, P);
         *dGx+=di2;
         *dGy+=dj3;
         st1[i-1] = '(';
@@ -878,8 +878,8 @@ PRIVATE char *fbacktrack_XS(int i, int j, const int** access_s1, const int** acc
                             P->mismatch23I[type2][SS1[i-2]][SS2[j+3]]+P->mismatch23I[rtype[type]][SS2[j+1]][SS1[i-1]]+di3+dj4)){
         k=i-3;
         l=j+4;
-        *dG+=E_IntLoop(i-k-1, l-j-1, type2, rtype[type],SS1[k+1], SS2[l-1], SS1[i-1], SS2[j+1],P);
-        *dGplex+=E_IntLoop(i-k-1, l-j-1, type2, rtype[type],SS1[k+1], SS2[l-1], SS1[i-1], SS2[j+1],P);
+        *dG+=E_IntLoop(i-k-1, l-j-1, type2, rtype[type],SS1[k+1], SS2[l-1], SS1[i-1], SS2[j+1], 0, 0, P);
+        *dGplex+=E_IntLoop(i-k-1, l-j-1, type2, rtype[type],SS1[k+1], SS2[l-1], SS1[i-1], SS2[j+1], 0, 0, P);
         *dGx+=di2;
         *dGy+=dj3;
         st1[i-1] = '(';
@@ -1022,7 +1022,7 @@ PRIVATE char *fbacktrack_XS(int i, int j, const int** access_s1, const int** acc
         int temp; temp=k; k=i-1; i=temp;
         temp=l; l=j+1; j=temp;
         type=pair[S1[i]][S2[j]];
-        *dG+=E_IntLoop(i-k-1, l-j-1, type2, rtype[type],SS1[k+1], SS2[l-1], SS1[i-1], SS2[j+1],P);
+        *dG+=E_IntLoop(i-k-1, l-j-1, type2, rtype[type],SS1[k+1], SS2[l-1], SS1[i-1], SS2[j+1], 0, 0, P);
         *dGx+=di1;
         *dGy+=dj1;
         i=k;
@@ -1045,7 +1045,7 @@ PRIVATE char *fbacktrack_XS(int i, int j, const int** access_s1, const int** acc
         int temp; temp=k; k=i-1; i=temp;
         temp=l; l=j; j=temp;
         type=pair[S1[i]][S2[j]];
-        *dG+=E_IntLoop(i-k-1, l-j-1, type2, rtype[type],SS1[k+1], SS2[l-1], SS1[i-1], SS2[j+1],P);
+        *dG+=E_IntLoop(i-k-1, l-j-1, type2, rtype[type],SS1[k+1], SS2[l-1], SS1[i-1], SS2[j+1], 0, 0, P);
         *dGplex+=bopen+bext+(type2>2?P->TerminalAU:0);
         *dGx+=di1;
         i=k;
@@ -1067,7 +1067,7 @@ PRIVATE char *fbacktrack_XS(int i, int j, const int** access_s1, const int** acc
         int temp; temp=k; k=i; i=temp;
         temp=l; l=j+1; j=temp;
         type=pair[S1[i]][S2[j]];
-        *dG+=E_IntLoop(i-k-1, l-j-1, type2, rtype[type],SS1[k+1], SS2[l-1], SS1[i-1], SS2[j+1],P);
+        *dG+=E_IntLoop(i-k-1, l-j-1, type2, rtype[type],SS1[k+1], SS2[l-1], SS1[i-1], SS2[j+1], 0, 0, P);
         *dGplex+=bopen+bext+(type2>2?P->TerminalAU:0);
         *dGy+=dj1;
         i=k;
@@ -1091,7 +1091,7 @@ PRIVATE char *fbacktrack_XS(int i, int j, const int** access_s1, const int** acc
         int temp; temp=k; k=i-1; i=temp;
         temp=l; l=j+1; j=temp;
         type=pair[S1[i]][S2[j]];
-        *dG+=E_IntLoop(i-k-1, l-j-1, type2, rtype[type],SS1[k+1], SS2[l-1], SS1[i-1], SS2[j+1],P);
+        *dG+=E_IntLoop(i-k-1, l-j-1, type2, rtype[type],SS1[k+1], SS2[l-1], SS1[i-1], SS2[j+1], 0, 0, P);
         *dGx+=di1;
         *dGy+=dj1;
         i=k;
@@ -1115,7 +1115,7 @@ PRIVATE char *fbacktrack_XS(int i, int j, const int** access_s1, const int** acc
         int temp; temp=k; k=i-1; i=temp;
         temp=l; l=j+1; j=temp;
         type=pair[S1[i]][S2[j]];
-        *dG+=E_IntLoop(i-k-1, l-j-1, type2, rtype[type],SS1[k+1], SS2[l-1], SS1[i-1], SS2[j+1],P);
+        *dG+=E_IntLoop(i-k-1, l-j-1, type2, rtype[type],SS1[k+1], SS2[l-1], SS1[i-1], SS2[j+1], 0, 0, P);
         *dGx+=di1;
         *dGy+=dj1;
         i=k;
@@ -1676,7 +1676,7 @@ PRIVATE duplexT duplexfold(const char *s1, const char *s2, const int extension_c
           type2 = pair[S1[k]][S2[l]];
           if (!type2) continue;
           E = E_IntLoop(i-k-1, l-j-1, type2, rtype[type],
-                        SS1[k+1], SS2[l-1], SS1[i-1], SS2[j+1],P)+(i-k+l-j)*extension_cost;
+                        SS1[k+1], SS2[l-1], SS1[i-1], SS2[j+1], 0, 0, P)+(i-k+l-j)*extension_cost;
           c[i][j] = MIN2(c[i][j], c[k][l]+E);
         }
       }
@@ -1734,7 +1734,7 @@ PRIVATE char *backtrack(int i, int j, const int extension_cost) {
         type2 = pair[S1[k]][S2[l]];
         if (!type2) continue;
         LE = E_IntLoop(i-k-1, l-j-1, type2, rtype[type],
-                       SS1[k+1], SS2[l-1], SS1[i-1], SS2[j+1],P)+(i-k+l-j)*extension_cost;
+                       SS1[k+1], SS2[l-1], SS1[i-1], SS2[j+1], 0, 0, P)+(i-k+l-j)*extension_cost;
         if (E == c[k][l]+LE) {
           traced=1; 
           i=k; j=l;
@@ -2041,7 +2041,7 @@ PRIVATE char *fbacktrack(int i, int j, const int extension_cost,const int il_a, 
       if(type2 && c[i][j]== (c[i - 1][j+1]+P->stack[rtype[type]][type2]+2*extension_cost)){
         k=i-1;
         l=j+1;
-        (*dG)+=E_IntLoop(i-k-1, l-j-1, type2, rtype[type],SS1[k+1], SS2[l-1], SS1[i-1], SS2[j+1],P);
+        (*dG)+=E_IntLoop(i-k-1, l-j-1, type2, rtype[type],SS1[k+1], SS2[l-1], SS1[i-1], SS2[j+1], 0, 0, P);
         st1[i-1] = '(';
         st2[j-1] = ')';
         i=k;
@@ -2054,7 +2054,7 @@ PRIVATE char *fbacktrack(int i, int j, const int extension_cost,const int il_a, 
       if(type2 && c[i][j]==(c[i - 1][j+2]+P->bulge[1]+P->stack[rtype[type]][type2]+3*extension_cost)){
         k=i-1;
         l=j+2;
-        *dG+=E_IntLoop(i-k-1, l-j-1, type2, rtype[type],SS1[k+1], SS2[l-1], SS1[i-1], SS2[j+1],P);
+        *dG+=E_IntLoop(i-k-1, l-j-1, type2, rtype[type],SS1[k+1], SS2[l-1], SS1[i-1], SS2[j+1], 0, 0, P);
         st1[i-1] = '(';
         st2[j-1] = ')';
         i=k;
@@ -2067,7 +2067,7 @@ PRIVATE char *fbacktrack(int i, int j, const int extension_cost,const int il_a, 
       if(type2 && c[i][j]==(c[i - 2][j+1]+P->bulge[1]+P->stack[type2][rtype[type]]+3*extension_cost)){
         k=i-2;
         l=j+1;
-        *dG+=E_IntLoop(i-k-1, l-j-1, type2, rtype[type],SS1[k+1], SS2[l-1], SS1[i-1], SS2[j+1],P);
+        *dG+=E_IntLoop(i-k-1, l-j-1, type2, rtype[type],SS1[k+1], SS2[l-1], SS1[i-1], SS2[j+1], 0, 0, P);
         st1[i-1] = '(';
         st2[j-1] = ')';
         i=k;
@@ -2080,7 +2080,7 @@ PRIVATE char *fbacktrack(int i, int j, const int extension_cost,const int il_a, 
       if(type2 && c[i][j]==(c[i - 2][j+2]+P->int11[type2][rtype[type]][SS1[i-1]][SS2[j+1]]+4*extension_cost)){
         k=i-2;
         l=j+2;
-        *dG+=E_IntLoop(i-k-1, l-j-1, type2, rtype[type],SS1[k+1], SS2[l-1], SS1[i-1], SS2[j+1],P);
+        *dG+=E_IntLoop(i-k-1, l-j-1, type2, rtype[type],SS1[k+1], SS2[l-1], SS1[i-1], SS2[j+1], 0, 0, P);
         st1[i-1] = '(';
         st2[j-1] = ')';
         i=k;
@@ -2093,7 +2093,7 @@ PRIVATE char *fbacktrack(int i, int j, const int extension_cost,const int il_a, 
       if(type2 && c[i][j]==(c[i - 3][j+3]+P->int22[type2][rtype[type]][SS1[i-2]][SS1[i-1]][SS2[j+1]][SS2[j+2]]+6*extension_cost)){
         k=i-3;
         l=j+3;
-        *dG+=E_IntLoop(i-k-1, l-j-1, type2, rtype[type],SS1[k+1], SS2[l-1], SS1[i-1], SS2[j+1],P);
+        *dG+=E_IntLoop(i-k-1, l-j-1, type2, rtype[type],SS1[k+1], SS2[l-1], SS1[i-1], SS2[j+1], 0, 0, P);
         st1[i-1] = '(';
         st2[j-1] = ')';
         i=k;
@@ -2106,7 +2106,7 @@ PRIVATE char *fbacktrack(int i, int j, const int extension_cost,const int il_a, 
       if(type2 && c[i][j]==(c[i - 3][j+2]+P->int21[rtype[type]][type2][SS2[j+1]][SS1[i-2]][SS1[i-1]]+5*extension_cost)){
         k=i-3;
         l=j+2;
-        *dG+=E_IntLoop(i-k-1, l-j-1, type2, rtype[type],SS1[k+1], SS2[l-1], SS1[i-1], SS2[j+1],P);
+        *dG+=E_IntLoop(i-k-1, l-j-1, type2, rtype[type],SS1[k+1], SS2[l-1], SS1[i-1], SS2[j+1], 0, 0, P);
         st1[i-1] = '(';
         st2[j-1] = ')';
         i=k;
@@ -2119,7 +2119,7 @@ PRIVATE char *fbacktrack(int i, int j, const int extension_cost,const int il_a, 
       if(type2 && c[i][j]==(c[i - 2][j+3]+P->int21[type2][rtype[type]][SS1[i-1]][SS2[j+1]][SS2[j+2]]+5*extension_cost)){
         k=i-2;
         l=j+3;
-        *dG+=E_IntLoop(i-k-1, l-j-1, type2, rtype[type],SS1[k+1], SS2[l-1], SS1[i-1], SS2[j+1],P);
+        *dG+=E_IntLoop(i-k-1, l-j-1, type2, rtype[type],SS1[k+1], SS2[l-1], SS1[i-1], SS2[j+1], 0, 0, P);
         st1[i-1] = '(';
         st2[j-1] = ')';
         i=k;
@@ -2133,7 +2133,7 @@ PRIVATE char *fbacktrack(int i, int j, const int extension_cost,const int il_a, 
                             P->mismatch23I[type2][SS1[i-3]][SS2[j+2]]+P->mismatch23I[rtype[type]][SS2[j+1]][SS1[i-1]]+7*extension_cost)){
         k=i-4;
         l=j+3;
-        *dG+=E_IntLoop(i-k-1, l-j-1, type2, rtype[type],SS1[k+1], SS2[l-1], SS1[i-1], SS2[j+1],P);
+        *dG+=E_IntLoop(i-k-1, l-j-1, type2, rtype[type],SS1[k+1], SS2[l-1], SS1[i-1], SS2[j+1], 0, 0, P);
         st1[i-1] = '(';
         st2[j-1] = ')';
         i=k;
@@ -2147,7 +2147,7 @@ PRIVATE char *fbacktrack(int i, int j, const int extension_cost,const int il_a, 
                             P->mismatch23I[type2][SS1[i-2]][SS2[j+3]]+P->mismatch23I[rtype[type]][SS2[j+1]][SS1[i-1]]+7*extension_cost)){
         k=i-3;
         l=j+4;
-        *dG+=E_IntLoop(i-k-1, l-j-1, type2, rtype[type],SS1[k+1], SS2[l-1], SS1[i-1], SS2[j+1],P);
+        *dG+=E_IntLoop(i-k-1, l-j-1, type2, rtype[type],SS1[k+1], SS2[l-1], SS1[i-1], SS2[j+1], 0, 0, P);
         st1[i-1] = '(';
         st2[j-1] = ')';
         i=k;
@@ -2259,7 +2259,7 @@ PRIVATE char *fbacktrack(int i, int j, const int extension_cost,const int il_a, 
         int temp; temp=k; k=i-1; i=temp;
         temp=l; l=j+1; j=temp;
         type=pair[S1[i]][S2[j]];
-        *dG+=E_IntLoop(i-k-1, l-j-1, type2, rtype[type],SS1[k+1], SS2[l-1], SS1[i-1], SS2[j+1],P);
+        *dG+=E_IntLoop(i-k-1, l-j-1, type2, rtype[type],SS1[k+1], SS2[l-1], SS1[i-1], SS2[j+1], 0, 0, P);
         i=k;
         j=l;
         state=1;
@@ -2278,7 +2278,7 @@ PRIVATE char *fbacktrack(int i, int j, const int extension_cost,const int il_a, 
         int temp; temp=k; k=i-1; i=temp;
         temp=l; l=j; j=temp;
         type=pair[S1[i]][S2[j]];
-        *dG+=E_IntLoop(i-k-1, l-j-1, type2, rtype[type],SS1[k+1], SS2[l-1], SS1[i-1], SS2[j+1],P);
+        *dG+=E_IntLoop(i-k-1, l-j-1, type2, rtype[type],SS1[k+1], SS2[l-1], SS1[i-1], SS2[j+1], 0, 0, P);
         i=k;
         j=l;
         state=1;
@@ -2298,7 +2298,7 @@ PRIVATE char *fbacktrack(int i, int j, const int extension_cost,const int il_a, 
         int temp; temp=k; k=i; i=temp;
         temp=l; l=j+1; j=temp;
         type=pair[S1[i]][S2[j]];
-        *dG+=E_IntLoop(i-k-1, l-j-1, type2, rtype[type],SS1[k+1], SS2[l-1], SS1[i-1], SS2[j+1],P);
+        *dG+=E_IntLoop(i-k-1, l-j-1, type2, rtype[type],SS1[k+1], SS2[l-1], SS1[i-1], SS2[j+1], 0, 0, P);
         i=k;
         j=l;
         state=1;
@@ -2317,7 +2317,7 @@ PRIVATE char *fbacktrack(int i, int j, const int extension_cost,const int il_a, 
         int temp; temp=k; k=i-1; i=temp;
         temp=l; l=j+1; j=temp;
         type=pair[S1[i]][S2[j]];
-        *dG+=E_IntLoop(i-k-1, l-j-1, type2, rtype[type],SS1[k+1], SS2[l-1], SS1[i-1], SS2[j+1],P);
+        *dG+=E_IntLoop(i-k-1, l-j-1, type2, rtype[type],SS1[k+1], SS2[l-1], SS1[i-1], SS2[j+1], 0, 0, P);
         i=k;
         j=l;
         state=1;
@@ -2336,7 +2336,7 @@ PRIVATE char *fbacktrack(int i, int j, const int extension_cost,const int il_a, 
         int temp; temp=k; k=i-1; i=temp;
         temp=l; l=j+1; j=temp;
         type=pair[S1[i]][S2[j]];
-        *dG+=E_IntLoop(i-k-1, l-j-1, type2, rtype[type],SS1[k+1], SS2[l-1], SS1[i-1], SS2[j+1],P);
+        *dG+=E_IntLoop(i-k-1, l-j-1, type2, rtype[type],SS1[k+1], SS2[l-1], SS1[i-1], SS2[j+1], 0, 0, P);
         i=k;
         j=l;
         state=1;

@@ -288,7 +288,7 @@ PUBLIC pu_contrib *pf_unstru(char *sequence, int w){
             temp=0.;
             if (type_2){
               type_2 = rtype[type_2];
-              temp = prpr[po] * qb[kl] * exp_E_IntLoop(u1, o-l-1, type, type_2, S1[p+1], S1[o-1], S1[k-1], S1[l+1], Pf) *scale[u1+o-l+1];
+              temp = prpr[po] * qb[kl] * exp_E_IntLoop(u1, o-l-1, type, type_2, S1[p+1], S1[o-1], S1[k-1], S1[l+1], p+1, l+1, Pf) *scale[u1+o-l+1];
               if((l+1) < o) store_Io[l+1] += temp; /* unpaired region between ]l,o[ */
               sum_l += temp;
             } /* end of if pair(k,l) */
@@ -742,7 +742,7 @@ PUBLIC interact *pf_interact( const char *s1,
           if (i-k+l-j-2<=MAXLOOP) {
             if(k >= prev_k && l <= prev_l) { /* don't violate constrains */
               E = exp_E_IntLoop(i-k-1,l-j-1, type2, rtype[type],
-                                S1[k+1], SS2[l-1], S1[i-1], SS2[j+1], Pf) *
+                                S1[k+1], SS2[l-1], S1[i-1], SS2[j+1], k+1, j+1, Pf) *
                                 scale[i-k+l-j]; /* add *scale[u1+u2+2] */
 
               qint_4[i][j][a][b] += ( qint_4[k][l][0][0]*E);

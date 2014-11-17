@@ -1116,7 +1116,7 @@ PRIVATE void pf2D_linear(TwoDpfold_vars *vars){
 
             if (type_2==0) continue;
             type_2 = rtype[type_2];
-            aux_en = exp_E_IntLoop(k-i-1, j-l-1, type, type_2, S1[i+1], S1[j-1], S1[k-1], S1[l+1], pf_params) * scale[k-i+j-l];
+            aux_en = exp_E_IntLoop(k-i-1, j-l-1, type, type_2, S1[i+1], S1[j-1], S1[k-1], S1[l+1], i+1, l+1, pf_params) * scale[k-i+j-l];
 
             /* get distance to reference if closing the interior loop
             *  d2 = dbp(S_{i,j}, S_{k,l} + {i,j})
@@ -2143,7 +2143,7 @@ PRIVATE void pf2D_circ(TwoDpfold_vars *vars){
             type2 = ptype[kl];
             if(!type2) continue;
 
-            qot = exp_E_IntLoop(ln2, ln1, rtype[type2], type, S1[l+1], S1[k-1], S1[p-1], S1[q+1], pf_params) * scale[ln1+ln2];
+            qot = exp_E_IntLoop(ln2, ln1, rtype[type2], type, S1[l+1], S1[k-1], S1[p-1], S1[q+1], l+1, q+1, pf_params) * scale[ln1+ln2];
 
             if(Q_B_rem[kl])
               vars->Q_cI_rem += Q_B_rem[pq] * Q_B_rem[kl] * qot;
@@ -2178,7 +2178,7 @@ PRIVATE void pf2D_circ(TwoDpfold_vars *vars){
             type2 = ptype[kl];
             if(!type2) continue;
 
-            qot = exp_E_IntLoop(ln2, ln1, rtype[type2], type, S1[l+1], S1[k-1], S1[p-1], S1[q+1], pf_params) * scale[ln1+ln2];
+            qot = exp_E_IntLoop(ln2, ln1, rtype[type2], type, S1[l+1], S1[k-1], S1[p-1], S1[q+1], l+1, q+1, pf_params) * scale[ln1+ln2];
 
             if(Q_B_rem[kl]){
               for(cnt1 = k_min_values_b[pq];
@@ -3165,7 +3165,7 @@ PRIVATE void  backtrack_qcI(TwoDpfold_vars *vars,
                                   rtype[type2], type,
                                   S1[q+1], S1[p-1],
                                   S1[i-1], S1[j+1],
-                                  pf_params)
+                                  q+1, j+1, pf_params)
                     * scale[ln1 + ln2];
               if(Q_B_rem[pq]){
                 qot +=  Q_B_rem[ij] * Q_B_rem[pq] * qt;
@@ -3213,7 +3213,7 @@ PRIVATE void  backtrack_qcI(TwoDpfold_vars *vars,
                                   rtype[type2], type,
                                   S1[q+1], S1[p-1],
                                   S1[i-1], S1[j+1],
-                                  pf_params)
+                                  q+1, j+1, pf_params)
                     * scale[ln1 + ln2];
               if(Q_B_rem[pq])
                 for(cnt1 = k_min_values_b[ij];
@@ -3296,7 +3296,7 @@ PRIVATE void  backtrack_qcI(TwoDpfold_vars *vars,
                                 rtype[type2], type,
                                 S1[q+1], S1[p-1],
                                 S1[i-1], S1[j+1],
-                                pf_params)
+                                q+1, j+1, pf_params)
                   * scale[ln1 + ln2];
             da  = base_d1
                   - referenceBPs1[ij]
@@ -3770,7 +3770,7 @@ PRIVATE void backtrack(TwoDpfold_vars *vars, char *pstruc, int d1, int d2, unsig
             da = base_d1 + referenceBPs1[my_iindx[i]-j] - referenceBPs1[my_iindx[k]-l];
             db = base_d2 + referenceBPs2[my_iindx[i]-j] - referenceBPs2[my_iindx[k]-l];
             type_2 = rtype[type_2];
-            FLT_OR_DBL tmp_en = exp_E_IntLoop(u1, j-l-1, type, type_2, S1[i+1], S1[j-1], S1[k-1], S1[l+1], pf_params) * scale[u1+j-l+1];
+            FLT_OR_DBL tmp_en = exp_E_IntLoop(u1, j-l-1, type, type_2, S1[i+1], S1[j-1], S1[k-1], S1[l+1], i+1, l+1, pf_params) * scale[u1+j-l+1];
 
             if(Q_B_rem[my_iindx[k]-l] != 0.){
               qbt1 += Q_B_rem[my_iindx[k]-l] * tmp_en;
@@ -3836,7 +3836,7 @@ backtrack_int_early_escape_rem:
             da = base_d1 + referenceBPs1[my_iindx[i]-j] - referenceBPs1[my_iindx[k]-l];
             db = base_d2 + referenceBPs2[my_iindx[i]-j] - referenceBPs2[my_iindx[k]-l];
             type_2 = rtype[type_2];
-            FLT_OR_DBL tmp_en = exp_E_IntLoop(u1, j-l-1, type, type_2, S1[i+1], S1[j-1], S1[k-1], S1[l+1], pf_params) * scale[u1+j-l+1];
+            FLT_OR_DBL tmp_en = exp_E_IntLoop(u1, j-l-1, type, type_2, S1[i+1], S1[j-1], S1[k-1], S1[l+1], i+1, l+1, pf_params) * scale[u1+j-l+1];
             if(d1 >= da && d2 >= db)
               if((d1 - da >= k_min_values_b[my_iindx[k]-l]) && (d1 - da <= k_max_values_b[my_iindx[k]-l]))
                 if((d2 - db >= l_min_values_b[my_iindx[k]-l][d1 - da]) && (d2 - db <= l_max_values_b[my_iindx[k]-l][d1 - da])){

@@ -266,7 +266,7 @@ PRIVATE int fill_arrays(const char *string, int maxdist, int zsc, double min_z) 
               if (no_close||(type_2==3)||(type_2==4))
                 if ((p>i+1)||(q<j-1)) continue;  /* continue unless stack */
 
-            energy = E_IntLoop(p-i-1, j-q-1, type, type_2, S1[i+1], S1[j-1], S1[p-1], S1[q+1],P);
+            energy = E_IntLoop(p-i-1, j-q-1, type, type_2, S1[i+1], S1[j-1], S1[p-1], S1[q+1], i+1, q+1, P);
             new_c = MIN2(new_c, energy + c[p][q-p]);
             if ((p==i+1)&&(j==q+1)) stackEnergy = energy; /* remember stack energy */
           } /* end q-loop */
@@ -1055,7 +1055,7 @@ PRIVATE char *backtrack(const char *string, int start, int maxdist){
             if ((p>i+1)||(q<j-1)) continue;  /* continue unless stack */
 
         /* energy = oldLoopEnergy(i, j, p, q, type, type_2); */
-        energy = E_IntLoop(p-i-1, j-q-1, type, type_2, S1[i+1], S1[j-1], S1[p-1], S1[q+1],P);
+        energy = E_IntLoop(p-i-1, j-q-1, type, type_2, S1[i+1], S1[j-1], S1[p-1], S1[q+1], i+1, q+1, P);
 
         new = energy+c[p][q-p];
         traced = (cij == new);

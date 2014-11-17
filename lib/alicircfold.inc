@@ -99,7 +99,7 @@ float circalifold(const char **strings, char *structure) {
             si1 = (i==1)? S[s][length] : S[s][i-1];
             sq1 = (q==length)? S[s][1] : S[s][q+1];
             energy += E_IntLoop(u1, u2, rt, type_2,
-                                 S[s][j+1], si1, S[s][p-1], sq1, P);
+                                 S[s][j+1], si1, S[s][p-1], sq1, 0, 0, P);
           }
           new_c = c[ij] + c[indx[q]+p] + energy;
           if (new_c<FcI) {

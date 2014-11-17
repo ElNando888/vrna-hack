@@ -66,7 +66,7 @@ PRIVATE void fill_arrays_circ(const char *string, int *bt){
           if (type_2==0) continue;
           u2 = i-1 + length-q;
           if (u1+u2>MAXLOOP) continue;
-          energy = E_IntLoop(u1, u2, type, type_2, S1[j+1], S1[i-1], S1[p-1], S1[q+1], P);
+          energy = E_IntLoop(u1, u2, type, type_2, S1[j+1], S1[i-1], S1[p-1], S1[q+1], j+1, q+1, P);
           new_c = c[ij] + c[indx[q]+p] + energy;
           if (new_c<FcI) {
             FcI = new_c; Ii=i; Ij=j; Ip=p; Iq=q;

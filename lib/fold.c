@@ -481,7 +481,7 @@ PRIVATE int fill_arrays(const char *string) {
                 if ((p>i+1)||(q<j-1)) continue;  /* continue unless stack */
 
             energy = E_IntLoop(p-i-1, j-q-1, type, type_2,
-                                S1[i+1], S1[j-1], S1[p-1], S1[q+1], P);
+                                S1[i+1], S1[j-1], S1[p-1], S1[q+1], i+1, q+1, P);
 
             ee = energy+c[indx[q]+p];
             new_c = MIN2(new_c, ee);
@@ -1079,7 +1079,7 @@ PRIVATE void backtrack(const char *string, int s) {
 
         /* energy = oldLoopEnergy(i, j, p, q, type, type_2); */
         energy = E_IntLoop(p-i-1, j-q-1, type, type_2,
-                            S1[i+1], S1[j-1], S1[p-1], S1[q+1], P);
+                            S1[i+1], S1[j-1], S1[p-1], S1[q+1], i+1, q+1, P);
 
         new = energy+c[indx[q]+p]+bonus;
         traced = (cij == new);
@@ -1505,6 +1505,8 @@ PRIVATE int en_corr_of_loop_gquad(int i,
                                         s1[s - 1],
                                         s1[elem_i - 1],
                                         s1[elem_j + 1],
+                                        0, /* s1 same as S1? */
+                                        0,
                                         P);
                     break;
           /* gquad was misinterpreted as unpaired nucleotides in a multiloop */
@@ -1680,7 +1682,7 @@ PUBLIC float energy_of_circ_struct_par( const char *string,
       si1 = (i==1)? S1[length] : S1[i-1];
       sq1 = (q==length)? S1[1] : S1[q+1];
       en0 = E_IntLoop(u1, u2, type, type_2,
-                       S1[j+1], si1, S1[p-1], sq1,P);
+                       S1[j+1], si1, S1[p-1], sq1, j+1, (q==length)? 1 : q+1, P);
     } else { /* degree > 2 */
       en0 = ML_Energy(0, 0) - P->MLintern[0];
       if (dangle_model) {
@@ -1766,7 +1768,7 @@ PRIVATE int stack_energy(int i, const char *string, int verbosity_level)
     }
     /* energy += LoopEnergy(i, j, p, q, type, type_2); */
     if ( SAME_STRAND(i,p) && SAME_STRAND(q,j) )
-      ee = E_IntLoop(p-i-1, j-q-1, type, type_2, S1[i+1], S1[j-1], S1[p-1], S1[q+1],P);
+      ee = E_IntLoop(p-i-1, j-q-1, type, type_2, S1[i+1], S1[j-1], S1[p-1], S1[q+1], i+1, q+1, P);
     else
       ee = energy_of_extLoop_pt(cut_in_loop(i), pair_table);
     if (verbosity_level>0)
@@ -2212,7 +2214,7 @@ PUBLIC int loop_energy(short * ptable, short *s, short *s1, int i) {
     /* energy += LoopEnergy(i, j, p, q, type, type_2); */
     if ( SAME_STRAND(i,p) && SAME_STRAND(q,j) )
       energy = E_IntLoop(p-i-1, j-q-1, type, type_2,
-                          S1[i+1], S1[j-1], S1[p-1], S1[q+1], P);
+                          S1[i+1], S1[j-1], S1[p-1], S1[q+1], i+1, q+1, P);
     else
       energy = energy_of_extLoop_pt(cut_in_loop(i), pair_table);
   }

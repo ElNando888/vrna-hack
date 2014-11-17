@@ -347,7 +347,7 @@ PUBLIC plist *pfl_fold_par( char *sequence,
                 type_2 = rtype[type_2];
                 qbt1 += qb[k][l] *
                   exp_E_IntLoop(u1, j-l-1, type, type_2,
-                                S1[i+1], S1[j-1], S1[k-1], S1[l+1], pf_params) * scale[k-i+j-l];
+                                S1[i+1], S1[j-1], S1[k-1], S1[l+1], i+1, l+1, pf_params) * scale[k-i+j-l];
               }
             }
           }
@@ -460,7 +460,7 @@ PUBLIC plist *pfl_fold_par( char *sequence,
             type = ptype[i][m];
             if ((pR[i][m]>0))
               pR[k][l] += pR[i][m]*exp_E_IntLoop(k-i-1, m-l-1, type, type_2,
-                                                 S1[i+1], S1[m-1], S1[k-1], S1[l+1], pf_params) * scale[k-i+m-l];
+                                                 S1[i+1], S1[m-1], S1[k-1], S1[l+1], i+1, l+1, pf_params) * scale[k-i+m-l];
           }
         }
         if (ulength) { /* NOT IF WITHIN INNER LOOP */
@@ -469,7 +469,7 @@ PUBLIC plist *pfl_fold_par( char *sequence,
               type = ptype[i][m];
               if ((pR[i][m]>0)){
                 temp=pR[i][m]*qb[k][l]*exp_E_IntLoop(k-i-1, m-l-1, type, type_2,
-                                                     S1[i+1], S1[m-1], S1[k-1], S1[l+1], pf_params) * scale[k-i+m-l];
+                                                     S1[i+1], S1[m-1], S1[k-1], S1[l+1], i+1, l+1, pf_params) * scale[k-i+m-l];
                 QI5[l][m-l-1]+=temp;
                 QI5[i][k-i-1]+=temp;
               }
@@ -760,7 +760,7 @@ PRIVATE plist *get_deppp(plist *pl, int start, int pairsize, int length) {
       int type=ptype[start-1][j+1];
       int type_2=rtype[ptype[start][j]];
       tmp=qb[start][j]/qb[start-1][(j+1)]*exp_E_IntLoop(0, 0, type, type_2,
-                                                        S1[start], S1[j], S1[start-1], S1[j+1], pf_params) * scale[2];
+                                                        S1[start], S1[j], S1[start-1], S1[j+1], start, j+1, pf_params) * scale[2];
        temp[count].i=start;
       temp[count].j=j;
       temp[count++].p=tmp;

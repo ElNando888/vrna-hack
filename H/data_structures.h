@@ -120,13 +120,10 @@ typedef struct{
   int     canonicalBPonly;  /**<  \brief  remove non-canonical bp's from constraint structures  */
 } model_detailsT;
 
-typedef struct _il_ctx {
-  int i, j, p, q;
-} IL_CTX;
-
 struct _paramT;
 typedef struct _paramT paramT;
-typedef void (*EILCB)(int* fe, int n1, int n2, int type, int type_2, int si1, int sj1, int sp1, int sq1, paramT *P);
+typedef void (*EILCB)(int* fe, int n1, int n2, int type, int type_2, int si1, int sj1, int sp1, int sq1, 
+                      int ii, int qq, paramT *P);
 /**
  *  \brief The datastructure that contains temperature scaled energy parameters.
  */
@@ -170,14 +167,14 @@ struct _paramT {
 
   model_detailsT model_details;   /**<  \brief  Model details to be used in the recursions */
 
-  IL_CTX  il_ctx;
   EILCB   eilcb;                  /**<  \brief  Application provided callback */
   void*   userdata;               /**<  \brief  Opaque data provided by the application */
 };
 
 struct _pf_paramT;
 typedef struct _pf_paramT pf_paramT;
-typedef void (*EEILCB)(double* fe, int u1, int u2, int type, int type2, short si1, short sj1, short sp1, short sq1, pf_paramT *P);
+typedef void (*EEILCB)(double* fe, int u1, int u2, int type, int type2, short si1, short sj1, short sp1, short sq1, 
+                       int ii, int qq, pf_paramT *P);
 /**
  *  \brief  The datastructure that contains temperature scaled Boltzmann weights of the energy parameters.
  */
@@ -231,7 +228,6 @@ struct _pf_paramT {
 
   model_detailsT model_details; /**<  \brief  Model details to be used in the recursions */
 
-  IL_CTX  il_ctx;
   EEILCB  eeilcb;               /**<  \brief  Application provided callback */
   void*   userdata;             /**<  \brief  Opaque data provided by the application */
 };

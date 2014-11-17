@@ -384,7 +384,7 @@ PRIVATE void pf_linear(const char *sequence, char *structure){
               type_2 = rtype[type_2];
               qbt1 += qb[my_iindx[k]-l] * (scale[u1+j-l+1] *
                                         exp_E_IntLoop(u1, j-l-1, type, type_2,
-                                        S1[i+1], S1[j-1], S1[k-1], S1[l+1], pf_params));
+                                        S1[i+1], S1[j-1], S1[k-1], S1[l+1], i+1, l+1, pf_params));
             }
           }
         }
@@ -525,7 +525,7 @@ PRIVATE void pf_circ(const char *sequence, char *structure){
 
           type2 = ptype[my_iindx[k]-l];
           if(!type2) continue;
-          qio += qb[my_iindx[p]-q] * qb[my_iindx[k]-l] * exp_E_IntLoop(ln2, ln1, rtype[type2], type, S1[l+1], S1[k-1], S1[p-1], S1[q+1], pf_params) * scale[ln1+ln2];
+          qio += qb[my_iindx[p]-q] * qb[my_iindx[k]-l] * exp_E_IntLoop(ln2, ln1, rtype[type2], type, S1[l+1], S1[k-1], S1[p-1], S1[q+1], l+1, q+1, pf_params) * scale[ln1+ln2];
         }
       } /* end of kl double loop */
     }
@@ -613,6 +613,8 @@ PUBLIC void pf_create_bppm(const char *sequence, char *structure){
                                         S1[i-1],
                                         S1[k-1],
                                         S1[l+1],
+                                        j+1,
+                                        l+1,
                                         pf_params)
                         * scale[ln1 + ln2];
               }
@@ -639,6 +641,8 @@ PUBLIC void pf_create_bppm(const char *sequence, char *structure){
                                         S1[k-1],
                                         S1[i-1],
                                         S1[j+1],
+                                        l+1,
+                                        j+1,
                                         pf_params)
                         * scale[ln1 + ln2];
               }
@@ -718,6 +722,8 @@ PUBLIC void pf_create_bppm(const char *sequence, char *structure){
                                        S1[j - 1],
                                        S1[k - 1],
                                        S1[l + 1],
+                                       i+1,
+                                       l+1,
                                        pf_params));
             }
           }
@@ -1115,7 +1121,7 @@ char *pbacktrack_circ(char *seq){
             type2 = ptype[my_iindx[k]-l];
             if(!type) continue;
             type2 = rtype[type2];
-            qt += qb[my_iindx[i]-j] * qb[my_iindx[k]-l] * exp_E_IntLoop(ln2, ln1, type2, type, S1[l+1], S1[k-1], S1[i-1], S1[j+1], pf_params) * scale[ln1 + ln2];
+            qt += qb[my_iindx[i]-j] * qb[my_iindx[k]-l] * exp_E_IntLoop(ln2, ln1, type2, type, S1[l+1], S1[k-1], S1[i-1], S1[j+1], l+1, j+1, pf_params) * scale[ln1 + ln2];
             /* found an exterior interior loop? also this time, we can go straight  */
             /* forward and backtracking the both enclosed parts and we're done      */
             if(qt>r){ backtrack(i,j); backtrack(k,l); return pstruc;}
@@ -1223,7 +1229,7 @@ PRIVATE void backtrack(int i, int j){
           /* add *scale[u1+u2+2] */
           qbt1 += qb[my_iindx[k]-l] * (scale[u1+j-l+1] *
             exp_E_IntLoop(u1, j-l-1, type, type_2,
-                          S1[i+1], S1[j-1], S1[k-1], S1[l+1], pf_params));
+                          S1[i+1], S1[j-1], S1[k-1], S1[l+1], i+1, l+1, pf_params));
         }
         if (qbt1 > r) break;
       }
@@ -1501,7 +1507,7 @@ PUBLIC plist *stackProb(double cutoff){
       if (qb[index[i+1]-(j-1)]<FLT_MIN) continue;
       p *= qb[index[i+1]-(j-1)]/qb[index[i]-j];
       p *= exp_E_IntLoop(0,0,ptype[index[i]-j],rtype[ptype[index[i+1]-(j-1)]],
-                         0,0,0,0, pf_params)*scale[2];/* add *scale[u1+u2+2] */
+                         0,0,0,0, 0, 0, pf_params)*scale[2];/* add *scale[u1+u2+2] */
       if (p>cutoff) {
         pl[num].i     = i;
         pl[num].j     = j;

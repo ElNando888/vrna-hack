@@ -390,7 +390,7 @@ PRIVATE void pf_co(const char *sequence){
                 type_2 = rtype[type_2];
                 qbt1 += qb[my_iindx[k]-l] *
                   exp_E_IntLoop(u1, j-l-1, type, type_2,
-                                S1[i+1], S1[j-1], S1[k-1], S1[l+1], pf_params)*scale[u1+j-l+1];
+                                S1[i+1], S1[j-1], S1[k-1], S1[l+1], i+1, l+1, pf_params)*scale[u1+j-l+1];
               }
             }
           }
@@ -540,7 +540,7 @@ PRIVATE void pf_co_bppm(const char *sequence, char *structure){
               type = ptype[ij];
               if ((probs[ij]>0)) {
                 probs[kl] += probs[ij]*exp_E_IntLoop(k-i-1, j-l-1, type, type_2,
-                                               S1[i+1], S1[j-1], S1[k-1], S1[l+1], pf_params)*scale[k-i+j-l];
+                                               S1[i+1], S1[j-1], S1[k-1], S1[l+1], i+1, l+1, pf_params)*scale[k-i+j-l];
               }
             }
           }
@@ -843,7 +843,7 @@ PRIVATE void backtrack(int i, int j) {
           type_2 = rtype[type_2];
           qbt1 += qb[my_iindx[k]-l] *
             exp_E_IntLoop(u1, j-l-1, type, type_2,
-                          S1[i+1], S1[j-1], S1[k-1], S1[l+1], pf_params)*scale[u1+j-l+1];
+                          S1[i+1], S1[j-1], S1[k-1], S1[l+1], i+1, l+1, pf_params)*scale[u1+j-l+1];
         }
         if (qbt1 > r) break;
       }

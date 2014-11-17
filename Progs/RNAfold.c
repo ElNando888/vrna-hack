@@ -75,7 +75,7 @@ enum {
 /* TODO: retrieve these from a file */
 motif  known_motifs[] = {
   {"FMN aptamer", 2, (const char *[]){"AGGAUA","GAAGG"}, (int[]){0,0}, (int[]){6,5}, 0, _FMN, NULL},
-  {"Sarcin-ricin (example)", 2, (const char*[]){"CCAGUA","GAACA"}, (int[]){0,0}, (int[]){6,5}, -250, _NONE, NULL}
+  {"Sarcin-ricin (example)", 2, (const char*[]){"CCAGUA","GAACA"}, (int[]){0,0}, (int[]){6,5}, -270, _NONE, NULL}
 };
 
 int num_motifs = sizeof(known_motifs) / sizeof(motif);
@@ -135,7 +135,7 @@ void detect_motifs(const char *sequence)
   }
 }
 
-void std_eilcb(int* fe, int n1, int n2, int type, int type_2, int si1, int sj1, int sp1, int sq1, paramT *P)
+void std_eilcb(int* fe, int n1, int n2, int type, int type_2, int si1, int sj1, int sp1, int sq1, int ii, int qq, paramT *P)
 {
   int i;
   for (i = 0; i < num_motifs; i++) {
@@ -144,31 +144,31 @@ void std_eilcb(int* fe, int n1, int n2, int type, int type_2, int si1, int sj1, 
     if (kmi->occur == NULL) continue;
 
     if (kmi->s_len[0]==n1 && kmi->s_len[1]==n2) {
-      fprintf(stderr,"n1-n2 %d,%d\n", si1, sq1);
-      if (in_list(kmi->occur[0], si1) && in_list(kmi->occur[1], sq1)) {
+      if (0) fprintf(stderr,"n1-n2 %d,%d\n", ii, qq);
+      if (in_list(kmi->occur[0], ii) && in_list(kmi->occur[1], qq)) {
         (*fe) += kmi->intrinsic;
         if (kmi->lig_index >= 0) {
           (*fe) += known_ligands[kmi->lig_index].deltaG;
         }
-        fprintf(stderr, "%s at %d+%d\n", kmi->name, si1, sq1);
+        fprintf(stderr, "%s at %d+%d\n", kmi->name, ii, qq);
         return;
       }
     }
     if (kmi->s_len[0]==n2 && kmi->s_len[1]==n1) {
-      fprintf(stderr,"n2-n1 %d,%d\n", sq1, si1);
-      if (in_list(kmi->occur[0], sq1) && in_list(kmi->occur[1], si1)) {
+      if (0) fprintf(stderr,"n2-n1 %d,%d\n", qq, ii);
+      if (in_list(kmi->occur[0], qq) && in_list(kmi->occur[1], ii)) {
         (*fe) += kmi->intrinsic;
         if (kmi->lig_index >= 0) {
           (*fe) += known_ligands[kmi->lig_index].deltaG;
         }
-        fprintf(stderr, "%s at %d+%d\n", kmi->name, sq1, si1);
+        fprintf(stderr, "%s at %d+%d\n", kmi->name, qq, ii);
         return;
       }
     }
   }
 }
 
-void std_eeilcb(double* fe, int u1, int u2, int type, int type2, short si1, short sj1, short sp1, short sq1, pf_paramT *P)
+void std_eeilcb(double* fe, int u1, int u2, int type, int type2, short si1, short sj1, short sp1, short sq1, int ii, int qq, pf_paramT *P)
 {
   int i;
   for (i = 0; i < num_motifs; i++) {
@@ -177,7 +177,7 @@ void std_eeilcb(double* fe, int u1, int u2, int type, int type2, short si1, shor
     if (kmi->occur == NULL) continue;
 
     if (kmi->s_len[0]==u1 && kmi->s_len[1]==u2) {
-      if (in_list(kmi->occur[0], si1) && in_list(kmi->occur[1], sq1)) {
+      if (in_list(kmi->occur[0], ii) && in_list(kmi->occur[1], qq)) {
         (*fe) *= exp(-kmi->intrinsic*10./(P->kT));
         if (kmi->lig_index >= 0) {
           (*fe) *= exp(-known_ligands[kmi->lig_index].deltaG*10./(P->kT));
@@ -186,7 +186,7 @@ void std_eeilcb(double* fe, int u1, int u2, int type, int type2, short si1, shor
       }
     }
     if (kmi->s_len[0]==u2 && kmi->s_len[1]==u1) {
-      if (in_list(kmi->occur[0], sq1) && in_list(kmi->occur[1], si1)) {
+      if (in_list(kmi->occur[0], qq) && in_list(kmi->occur[1], ii)) {
         (*fe) *= exp(-kmi->intrinsic*10./(P->kT));
         if (kmi->lig_index >= 0) {
           (*fe) *= exp(-known_ligands[kmi->lig_index].deltaG*10./(P->kT));

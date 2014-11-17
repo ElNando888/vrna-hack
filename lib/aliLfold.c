@@ -273,6 +273,8 @@ PRIVATE int fill_arrays(const char **strings, int maxdist, char *structure) {
                                   S5[s][j],
                                   S5[s][p],
                                   S3[s][q],
+                                  0,
+                                  0,
                                   P);
             }
             new_c = MIN2(energy+c[p][q-p], new_c);
@@ -720,6 +722,8 @@ PRIVATE char * backtrack(const char **strings, int start, int maxdist) {
                               S5[ss][j],
                               S5[ss][p],
                               S3[ss][q],
+                              0,
+                              0,
                               P);
         }
         traced = (cij == energy+c[p][q-p]);

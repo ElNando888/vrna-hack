@@ -494,7 +494,7 @@ PRIVATE int alifill_arrays(const char **strings, const int max_asymm, const int 
               if (type_2 == 0) type_2 = 7;
               energy += E_IntLoop(p-i-1, j-q-1, type[s], type_2,
                                   Sali[s][i+1], Sali[s][j-1],
-                                  Sali[s][p-1], Sali[s][q+1],P);
+                                  Sali[s][p-1], Sali[s][q+1], 0, 0, P);
             }
             new_c = MIN2(energy+c[indx[q]+p], new_c);
             if ((p==i+1)&&(j==q+1)) stackEnergy = energy; /* remember stack energy */
@@ -648,7 +648,7 @@ PRIVATE int alibacktrack(const char **strings, int s) {
           if (type_2==0) type_2 = 7;
           energy += E_IntLoop(p-i-1, j-q-1, type[ss], type_2,
                                Sali[ss][i+1], Sali[ss][j-1],
-                              Sali[ss][p-1], Sali[ss][q+1],P);
+                              Sali[ss][p-1], Sali[ss][q+1], 0, 0, P);
         }
         traced = (cij == energy+c[indx[q]+p]);
         if (traced) {
@@ -750,7 +750,7 @@ PRIVATE int fill_arrays(const char *string, const int max_asymm, const int thres
                 if ((p>i+1)||(q<j-1)) continue;  /* continue unless stack */
 
             energy = E_IntLoop(p-i-1, j-q-1, type, type_2,
-                               S1[i+1], S1[j-1], S1[p-1], S1[q+1],P);
+                               S1[i+1], S1[j-1], S1[p-1], S1[q+1], i+1, q+1, P);
             new_c = MIN2(energy+c[indx[q]+p], new_c);
             if ((p==i+1)&&(j==q+1)) stackEnergy = energy; /* remember stack energy */
 
@@ -952,7 +952,7 @@ PRIVATE void backtrack(const char *string, int s) {
           if (no_close||(type_2==3)||(type_2==4))
             if ((p>i+1)||(q<j-1)) continue;  /* continue unless stack */
         energy = E_IntLoop(p-i-1, j-q-1, type, type_2,
-                           S1[i+1], S1[j-1], S1[p-1], S1[q+1],P);
+                           S1[i+1], S1[j-1], S1[p-1], S1[q+1], i+1, q+1, P);
         new = energy+c[indx[q]+p]+bonus;
         traced = (cij == new);
         if (traced) {

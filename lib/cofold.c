@@ -403,7 +403,7 @@ PRIVATE int fill_arrays(const char *string) {
                 if ((p>i+1)||(q<j-1)) continue;  /* continue unless stack */
 
             if (SAME_STRAND(i,p) && SAME_STRAND(q,j))
-              energy = E_IntLoop(p-i-1, j-q-1, type, type_2, si, sj, S1[p-1], S1[q+1], P);
+              energy = E_IntLoop(p-i-1, j-q-1, type, type_2, si, sj, S1[p-1], S1[q+1], SAME_STRAND(i, i+1) ? i+1 : 0, q+1, P);
             else
               energy = E_IntLoop_Co(rtype[type], rtype[type_2],
                                     i, j, p, q,
@@ -1038,7 +1038,7 @@ PRIVATE void backtrack_co(const char *string, int s, int b /* b=0: start new str
         /* energy = oldLoopEnergy(i, j, p, q, type, type_2); */
         if (SAME_STRAND(i,p) && SAME_STRAND(q,j))
           energy = E_IntLoop(p-i-1, j-q-1, type, type_2,
-                              S1[i+1], S1[j-1], S1[p-1], S1[q+1], P);
+                              S1[i+1], S1[j-1], S1[p-1], S1[q+1], i+1, q+1, P);
         else {
           energy = E_IntLoop_Co(rtype[type], rtype[type_2], i, j, p, q, cut_point, S1[i+1], S1[j-1], S1[p-1], S1[q+1], dangle_model, P);
         }

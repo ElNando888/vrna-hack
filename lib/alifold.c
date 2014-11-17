@@ -370,7 +370,7 @@ PRIVATE int fill_arrays(const char **strings) {
               if (type_2 == 0) type_2 = 7;
               energy += E_IntLoop(a2s[s][p-1]-a2s[s][i], a2s[s][j-1]-a2s[s][q], type[s], type_2,
                                    S3[s][i], S5[s][j],
-                                   S5[s][p], S3[s][q], P);
+                                   S5[s][p], S3[s][q], 0, 0, P);
             }
             new_c = MIN2(new_c, energy + c[indx[q]+p]);
             if ((p==i+1)&&(j==q+1)) stackEnergy = energy; /* remember stack energy */
@@ -812,7 +812,7 @@ PRIVATE void backtrack(const char **strings, int s) {
           energy += E_IntLoop(a2s[ss][p-1]-a2s[ss][i],a2s[ss][j-1]-a2s[ss][q],
                                type[ss], type_2,
                                S3[ss][i], S5[ss][j],
-                               S5[ss][p], S3[ss][q], P);
+                               S5[ss][p], S3[ss][q], 0, 0, P);
 
         }
         traced = (cij == energy+c[indx[q]+p]);
@@ -1424,6 +1424,8 @@ PRIVATE void en_corr_of_loop_gquad(int i,
                                         S5[cnt][s],
                                         S5[cnt][elem_i],
                                         S3[cnt][elem_j],
+                                        0,
+                                        0,
                                         P);
                       }
                       energy -= ee;
@@ -1601,7 +1603,7 @@ PRIVATE void stack_energy_pt(int i, const char **sequences, short *pt, int n_seq
       if (type_2==0) {
         type_2=7;
       }
-      ee += E_IntLoop(a2s[s][p-1]-a2s[s][i], a2s[s][j-1]-a2s[s][q], type[s], type_2, S3[s][i], S5[s][j], S5[s][p], S3[s][q], P);
+      ee += E_IntLoop(a2s[s][p-1]-a2s[s][i], a2s[s][j-1]-a2s[s][q], type[s], type_2, S3[s][i], S5[s][j], S5[s][p], S3[s][q], 0, 0, P);
     }
     energy[0] += ee;
     energy[1] += pscore[indx[j]+i];

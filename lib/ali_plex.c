@@ -173,7 +173,7 @@ PRIVATE duplexT aliduplexfold(const char *s1[], const char *s2[], const int exte
             type2 = pair[S1[s][k]][S2[s][l]];
             if (type2==0) type2=7;
             E += E_IntLoop(i-k-1, l-j-1, type2, rtype[type[s]],
-                           S1[s][k+1], S2[s][l-1], S1[s][i-1], S2[s][j+1],P) + (i-k+l-j)*extension_cost;
+                           S1[s][k+1], S2[s][l-1], S1[s][i-1], S2[s][j+1], 0, 0, P) + (i-k+l-j)*extension_cost;
           }
           c[i][j] = MIN2(c[i][j], c[k][l]+E);
         }
@@ -251,7 +251,7 @@ PRIVATE char *alibacktrack(int i, int j, const short *S1[], const short *S2[], c
           type2 = pair[S1[s][k]][S2[s][l]];
           if (type2==0) type2=7;
           LE += E_IntLoop(i-k-1, l-j-1, type2, rtype[type[s]],
-                          S1[s][k+1], S2[s][l-1], S1[s][i-1], S2[s][j+1],P)+(i-k+l-j)*extension_cost;
+                          S1[s][k+1], S2[s][l-1], S1[s][i-1], S2[s][j+1], 0, 0, P)+(i-k+l-j)*extension_cost;
         }
         if (E == c[k][l]+LE) {
           traced=1; 
@@ -432,23 +432,23 @@ duplexT** aliLduplexfold(const char *s1[], const char *s2[], const int threshold
       }
       for (s=0; s<n_seq; s++) {
         type2=pair[S1[s][i-1]][S2[s][j+1]];if (type2==0) type2=7;
-        c_stack+=E_IntLoop(0,0,type2, rtype[type[s]],S1[s][i], S2[s][j], S1[s][i-1], S2[s][j+1], P)+2*extension_cost;
+        c_stack+=E_IntLoop(0,0,type2, rtype[type[s]],S1[s][i], S2[s][j], S1[s][i-1], S2[s][j+1], 0, 0, P)+2*extension_cost;
         type2=pair[S1[s][i-1]][S2[s][j+2]];if (type2==0) type2=7;
-        c_01   +=E_IntLoop(0,1,type2, rtype[type[s]],S1[s][i], S2[s][j+1], S1[s][i-1], S2[s][j+1], P)+3*extension_cost;
+        c_01   +=E_IntLoop(0,1,type2, rtype[type[s]],S1[s][i], S2[s][j+1], S1[s][i-1], S2[s][j+1], 0, 0, P)+3*extension_cost;
         type2=pair[S1[s][i-2]][S2[s][j+1]]; if (type2==0) type2=7;
-        c_10   +=E_IntLoop(1,0,type2, rtype[type[s]],S1[s][i-1], S2[s][j], S1[s][i-1], S2[s][j+1], P)+3*extension_cost;
+        c_10   +=E_IntLoop(1,0,type2, rtype[type[s]],S1[s][i-1], S2[s][j], S1[s][i-1], S2[s][j+1], 0, 0, P)+3*extension_cost;
         type2=pair[S1[s][i-2]][S2[s][j+2]]; if (type2==0) type2=7;
-        c_11   +=E_IntLoop(1,1,type2, rtype[type[s]],S1[s][i-1], S2[s][j+1], S1[s][i-1], S2[s][j+1], P)+4*extension_cost;
+        c_11   +=E_IntLoop(1,1,type2, rtype[type[s]],S1[s][i-1], S2[s][j+1], S1[s][i-1], S2[s][j+1], 0, 0, P)+4*extension_cost;
         type2 = pair[S1[s][i-3]][S2[s][j+3]];if (type2==0) type2=7;
-        c_22   +=E_IntLoop(2,2,type2, rtype[type[s]],S1[s][i-2], S2[s][j+2], S1[s][i-1], S2[s][j+1], P)+6*extension_cost;
+        c_22   +=E_IntLoop(2,2,type2, rtype[type[s]],S1[s][i-2], S2[s][j+2], S1[s][i-1], S2[s][j+1], 0, 0, P)+6*extension_cost;
         type2 = pair[S1[s][i-3]][S2[s][j+2]];if (type2==0) type2=7;
-        c_21   +=E_IntLoop(2,1,type2, rtype[type[s]],S1[s][i-2], S2[s][j+1], S1[s][i-1], S2[s][j+1], P)+5*extension_cost;
+        c_21   +=E_IntLoop(2,1,type2, rtype[type[s]],S1[s][i-2], S2[s][j+1], S1[s][i-1], S2[s][j+1], 0, 0, P)+5*extension_cost;
         type2 = pair[S1[s][i-2]][S2[s][j+3]];if (type2==0) type2=7;
-        c_12   +=E_IntLoop(1,2,type2, rtype[type[s]],S1[s][i-1], S2[s][j+2], S1[s][i-1], S2[s][j+1], P)+5*extension_cost;
+        c_12   +=E_IntLoop(1,2,type2, rtype[type[s]],S1[s][i-1], S2[s][j+2], S1[s][i-1], S2[s][j+1], 0, 0, P)+5*extension_cost;
         type2 = pair[S1[s][i-4]][S2[s][j+3]];if (type2==0) type2=7;
-        c_32   +=E_IntLoop(3,2,type2, rtype[type[s]],S1[s][i-3], S2[s][j+2], S1[s][i-1], S2[s][j+1], P)+7*extension_cost;
+        c_32   +=E_IntLoop(3,2,type2, rtype[type[s]],S1[s][i-3], S2[s][j+2], S1[s][i-1], S2[s][j+1], 0, 0, P)+7*extension_cost;
         type2 = pair[S1[s][i-3]][S2[s][j+4]];if (type2==0) type2=7;
-        c_23   +=E_IntLoop(2,3,type2, rtype[type[s]],S1[s][i-2], S2[s][j+3], S1[s][i-1], S2[s][j+1], P)+7*extension_cost;
+        c_23   +=E_IntLoop(2,3,type2, rtype[type[s]],S1[s][i-2], S2[s][j+3], S1[s][i-1], S2[s][j+1], 0, 0, P)+7*extension_cost;
         c_in   +=P->mismatchI[rtype[type[s]]][S1[s][i-1]][S2[s][j+1]]+2*extension_cost+2*iext_s;
         c_in2x +=P->mismatchI[rtype[type[s]]][S1[s][i-1]][S2[s][j+1]]+iext_s+2*iext_ass+2*extension_cost;
         c_in2y +=P->mismatchI[rtype[type[s]]][S1[s][i-1]][S2[s][j+1]]+iext_s+2*iext_ass+2*extension_cost;
@@ -724,7 +724,7 @@ PRIVATE duplexT aliduplexfold_XS(const char *s1[], const char *s2[],
             type3=pair[S1[s][p]][S2[s][q]];
             if(type3==0) type3=7;
             E += E_IntLoop(p-k-1, l-q-1, type2[s], rtype[type3],
-                           S1[s][k+1], S2[s][l-1], S1[s][p-1], S2[s][q+1],P);
+                           S1[s][k+1], S2[s][l-1], S1[s][p-1], S2[s][q+1], 0, 0, P);
           }
           c[k][l] = MIN2(c[k][l], c[p][q]+E);
         }
@@ -813,7 +813,7 @@ PRIVATE char *alibacktrack_XS(int i, int j, const short *S1[], const short *S2[]
           type2 = pair[S1[s][k]][S2[s][l]];
           if (type2==0) type2=7;
           LE += E_IntLoop(k-i-1, j-l-1, type[s], rtype[type2], 
-                          S1[s][i+1], S2[s][j-1], S1[s][k-1], S2[s][l+1],P);
+                          S1[s][i+1], S2[s][j-1], S1[s][k-1], S2[s][l+1], 0, 0, P);
         }
         if (E == c[k][l]+LE) {
           traced=1; 
@@ -1008,23 +1008,23 @@ duplexT** aliLduplexfold_XS(const char*s1[], const char* s2[], const int **acces
       }
       for (s=0; s<n_seq; s++) {
         type2=pair[S1[s][i-1]][S2[s][j+1]];if (type2==0) type2=7;
-        c_stack+=E_IntLoop(0,0,type2, rtype[type[s]],S1[s][i], S2[s][j], S1[s][i-1], S2[s][j+1], P)+di1+dj1;
+        c_stack+=E_IntLoop(0,0,type2, rtype[type[s]],S1[s][i], S2[s][j], S1[s][i-1], S2[s][j+1], 0, 0, P)+di1+dj1;
         type2=pair[S1[s][i-1]][S2[s][j+2]];if (type2==0) type2=7;
-        c_01   +=E_IntLoop(0,1,type2, rtype[type[s]],S1[s][i], S2[s][j+1], S1[s][i-1], S2[s][j+1], P)+di1+dj2;
+        c_01   +=E_IntLoop(0,1,type2, rtype[type[s]],S1[s][i], S2[s][j+1], S1[s][i-1], S2[s][j+1], 0, 0, P)+di1+dj2;
         type2=pair[S1[s][i-2]][S2[s][j+1]];if (type2==0) type2=7;
-        c_10   +=E_IntLoop(1,0,type2, rtype[type[s]],S1[s][i-1], S2[s][j], S1[s][i-1], S2[s][j+1], P)+di2+dj1;
+        c_10   +=E_IntLoop(1,0,type2, rtype[type[s]],S1[s][i-1], S2[s][j], S1[s][i-1], S2[s][j+1], 0, 0, P)+di2+dj1;
         type2=pair[S1[s][i-2]][S2[s][j+2]];if (type2==0) type2=7;
-        c_11   +=E_IntLoop(1,1,type2, rtype[type[s]],S1[s][i-1], S2[s][j+1], S1[s][i-1], S2[s][j+1], P)+di2+dj2;
+        c_11   +=E_IntLoop(1,1,type2, rtype[type[s]],S1[s][i-1], S2[s][j+1], S1[s][i-1], S2[s][j+1], 0, 0, P)+di2+dj2;
         type2=pair[S1[s][i-3]][S2[s][j+3]];if (type2==0) type2=7;
-        c_22   +=E_IntLoop(2,2,type2, rtype[type[s]],S1[s][i-2], S2[s][j+2], S1[s][i-1], S2[s][j+1], P)+di3+dj3;
+        c_22   +=E_IntLoop(2,2,type2, rtype[type[s]],S1[s][i-2], S2[s][j+2], S1[s][i-1], S2[s][j+1], 0, 0, P)+di3+dj3;
         type2= pair[S1[s][i-3]][S2[s][j+2]];if (type2==0) type2=7;
-        c_21   +=E_IntLoop(2,1,type2, rtype[type[s]],S1[s][i-2], S2[s][j+1], S1[s][i-1], S2[s][j+1], P)+di3+dj2;
+        c_21   +=E_IntLoop(2,1,type2, rtype[type[s]],S1[s][i-2], S2[s][j+1], S1[s][i-1], S2[s][j+1], 0, 0, P)+di3+dj2;
         type2= pair[S1[s][i-2]][S2[s][j+3]];if (type2==0) type2=7;
-        c_12   +=E_IntLoop(1,2,type2, rtype[type[s]],S1[s][i-1], S2[s][j+2], S1[s][i-1], S2[s][j+1], P)+di2+dj3;
+        c_12   +=E_IntLoop(1,2,type2, rtype[type[s]],S1[s][i-1], S2[s][j+2], S1[s][i-1], S2[s][j+1], 0, 0, P)+di2+dj3;
         type2 = pair[S1[s][i-4]][S2[s][j+3]];if (type2==0) type2=7;
-        c_32   +=E_IntLoop(3,2,type2, rtype[type[s]],S1[s][i-3], S2[s][j+2], S1[s][i-1], S2[s][j+1], P)+di4+dj3;
+        c_32   +=E_IntLoop(3,2,type2, rtype[type[s]],S1[s][i-3], S2[s][j+2], S1[s][i-1], S2[s][j+1], 0, 0, P)+di4+dj3;
         type2 = pair[S1[s][i-3]][S2[s][j+4]];if (type2==0) type2=7;
-        c_23   +=E_IntLoop(2,3,type2, rtype[type[s]],S1[s][i-2], S2[s][j+3], S1[s][i-1], S2[s][j+1], P)+dj4+di3;
+        c_23   +=E_IntLoop(2,3,type2, rtype[type[s]],S1[s][i-2], S2[s][j+3], S1[s][i-1], S2[s][j+1], 0, 0, P)+dj4+di3;
         c_in   +=P->mismatchI[rtype[type[s]]][S1[s][i-1]][S2[s][j+1]]+di3+dj3+2*iext_s;
         c_in2x +=P->mismatchI[rtype[type[s]]][S1[s][i-1]][S2[s][j+1]]+iext_s+2*iext_ass+di4+dj2;
         c_in2y +=P->mismatchI[rtype[type[s]]][S1[s][i-1]][S2[s][j+1]]+iext_s+2*iext_ass+di2+dj4;

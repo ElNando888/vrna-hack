@@ -909,7 +909,7 @@ PRIVATE void mfe_linear(TwoDfold_vars *vars){
               if(no_close||(type_2==3)||(type_2==4))
                 if((p>i+1)||(q<j-1)) continue;  /* continue unless stack */
 
-            energy = E_IntLoop(p-i-1, j-q-1, type, type_2, S1[i+1], S1[j-1], S1[p-1], S1[q+1], P);
+            energy = E_IntLoop(p-i-1, j-q-1, type, type_2, S1[i+1], S1[j-1], S1[p-1], S1[q+1], i+1, q+1, P);
 
             if(vars->E_C[pq] != NULL){
               for(cnt1 = vars->k_min_values[pq]; cnt1 <= vars->k_max_values[pq]; cnt1++){
@@ -2105,7 +2105,7 @@ PRIVATE void backtrack_c(unsigned int i, unsigned int j, int k, int l, char *str
       d1 = base_d1 - referenceBPs1[pq];
       d2 = base_d2 - referenceBPs2[pq];
 
-      energy = E_IntLoop(p-i-1, j-q-1, type, type_2, S1[i+1], S1[j-1], S1[p-1], S1[q+1], P);
+      energy = E_IntLoop(p-i-1, j-q-1, type, type_2, S1[i+1], S1[j-1], S1[p-1], S1[q+1], i+1, q+1, P);
 
 
       if(k == -1){
@@ -2775,7 +2775,7 @@ PRIVATE void backtrack_fc(int k, int l, char *structure, TwoDfold_vars *vars){
               if (type_2==0) continue;
               u2 = i-1 + seq_length-q;
               if (u1+u2>MAXLOOP) continue;
-              energy = E_IntLoop(u1, u2, type, type_2, S1[j+1], S1[i-1], S1[p-1], S1[q+1], P);
+              energy = E_IntLoop(u1, u2, type, type_2, S1[j+1], S1[i-1], S1[p-1], S1[q+1], j+1, q+1, P);
               if(E_C_rem[ij] != INF){
                 if(E_C[pq])
                   for(cnt1 = k_min_values[pq];
@@ -3004,7 +3004,7 @@ PRIVATE void backtrack_fc(int k, int l, char *structure, TwoDfold_vars *vars){
                   */
                   d1 = base_d1 - referenceBPs1[ij] - referenceBPs1[pq];
                   d2 = base_d2 - referenceBPs2[ij] - referenceBPs2[pq];
-                  energy = E_IntLoop(u1, u2, type, type_2, S1[j+1], S1[i-1], S1[p-1], S1[q+1], P);
+                  energy = E_IntLoop(u1, u2, type, type_2, S1[j+1], S1[i-1], S1[p-1], S1[q+1], j+1, q+1, P);
                   if((k >= d1) && (l >= d2))
                     for(cnt1 = k_min_values[ij]; cnt1 <= MIN2(k_max_values[ij], k - d1); cnt1++)
                       for(cnt2 = l_min_values[ij][cnt1]; cnt2 <= MIN2(l_max_values[ij][cnt1], l - d2); cnt2+=2)
@@ -3598,7 +3598,7 @@ PRIVATE void mfe_circ(TwoDfold_vars *vars){
             */
             d1 = base_d1 - referenceBPs1[ij] - referenceBPs1[pq];
             d2 = base_d2 - referenceBPs2[ij] - referenceBPs2[pq];
-            energy = E_IntLoop(u1, u2, type, type_2, S1[j+1], S1[i-1], S1[p-1], S1[q+1], P);
+            energy = E_IntLoop(u1, u2, type, type_2, S1[j+1], S1[i-1], S1[p-1], S1[q+1], j+1, q+1, P);
 
             if(E_C_rem[pq] != INF)
               vars->E_FcI_rem = MIN2(vars->E_FcI_rem, E_C_rem[ij] + E_C_rem[pq] + energy);
@@ -3636,7 +3636,7 @@ PRIVATE void mfe_circ(TwoDfold_vars *vars){
             */
             d1 = base_d1 - referenceBPs1[ij] - referenceBPs1[pq];
             d2 = base_d2 - referenceBPs2[ij] - referenceBPs2[pq];
-            energy = E_IntLoop(u1, u2, type, type_2, S1[j+1], S1[i-1], S1[p-1], S1[q+1], P);
+            energy = E_IntLoop(u1, u2, type, type_2, S1[j+1], S1[i-1], S1[p-1], S1[q+1], j+1, q+1, P);
             if(E_C_rem[pq] != INF){
               for(cnt1 = k_min_values[ij];
                   cnt1 <= k_max_values[ij];
