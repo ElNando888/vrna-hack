@@ -53,9 +53,11 @@ typedef struct _motif {
   /* static fields */
   const char *name;
   unsigned   num_segments;
-  const char **segment;
-  int        intrinsic;   /* in dcal/mol */
-  int        lig_index;
+  const char **segment;   /* for matching against the sequence */
+  int        *s_ofs;      /* offset from th matched substring */
+  int        *s_len;      /* for comparison in the callbacks */
+  int        intrinsic;   /* in dcal/mol, estimated deviation from the model */
+  int        lig_index;   /* which ligand, if any */
   /* runtime */
   int        **occur;
 } motif;
@@ -70,10 +72,67 @@ enum {
   _NONE = -1
 };
 
+/* TODO: retrieve these from a file */
 motif  known_motifs[] = {
-  {"FMN aptamer", 2, (const char *[]){"AGGAUA","GAAGG"}, 0, _FMN, NULL},
-  {"Sarcin-ricin (example)", 2, (const char*[]){"CCAGUA","GAACA"}, -100, _NONE, NULL}
+  {"FMN aptamer", 2, (const char *[]){"AGGAUA","GAAGG"}, (int[]){0,0}, (int[]){6,5}, 0, _FMN, NULL},
+  {"Sarcin-ricin (example)", 2, (const char*[]){"CCAGUA","GAACA"}, (int[]){0,0}, (int[]){6,5}, -250, _NONE, NULL}
 };
+
+int num_motifs = sizeof(known_motifs) / sizeof(motif);
+
+
+void reset_motifs(void)
+{
+  int i,k;
+  for (i = 0; i < num_motifs; i++) {
+    if (known_motifs[i].occur == NULL) continue;
+    for (k=0; k < known_motifs[i].num_segments; k++) {
+      if (known_motifs[i].occur[k]) free(known_motifs[i].occur[k]);
+    }
+    free(known_motifs[i].occur);
+    known_motifs[i].occur = NULL;
+  }
+}
+
+void add_list(int* list, int val)
+{
+  int size = 1+list[0];
+  list = realloc(list, (size+1)*sizeof(int));
+  list[0]++;
+  list[list[0]] = val;
+}
+
+int in_list(int* list, int val)
+{
+  int i;
+  for(i=1; i<=list[0]; i++) if (list[i]==val) return i;
+  return 0;
+}
+
+void detect_motifs(const char *sequence)
+{
+  int i,j,k;
+  
+  reset_motifs();
+  
+  for (i = 0; i < num_motifs; i++) {
+    for (j=0; j < known_motifs[i].num_segments; j++) {
+      const char* p;
+      const char* needle = known_motifs[i].segment[j];
+      for (p = strstr(sequence, needle); p; p = strstr(p+1, needle)) {
+        int ofs = p - sequence;
+        if (!ofs) continue;
+        if (known_motifs[i].occur == NULL) {
+          known_motifs[i].occur = (int**)calloc(known_motifs[i].num_segments, sizeof(int*));
+          for (k=0; k < known_motifs[i].num_segments; k++) {
+            known_motifs[i].occur[k] = (int*)calloc(1, sizeof(int));
+          }
+        }
+        add_list(known_motifs[i].occur[j], ofs /* +1 -1 */ + known_motifs[i].s_ofs[j]);
+      }
+    }
+  }
+}
 
 /*--------------------------------------------------------------------------*/
 
