@@ -128,11 +128,75 @@ void detect_motifs(const char *sequence)
             known_motifs[i].occur[k] = (int*)calloc(1, sizeof(int));
           }
         }
-        add_list(known_motifs[i].occur[j], ofs /* +1 -1 */ + known_motifs[i].s_ofs[j]);
+        if (1) fprintf(stderr,"%s[%d] found at %d\n", known_motifs[i].name, j, ofs+1);
+        add_list(known_motifs[i].occur[j], ofs+1 + known_motifs[i].s_ofs[j]);
       }
     }
   }
 }
+
+void std_eilcb(int* fe, int n1, int n2, int type, int type_2, int si1, int sj1, int sp1, int sq1, paramT *P)
+{
+  int i;
+  for (i = 0; i < num_motifs; i++) {
+    motif* kmi = known_motifs+i;
+    if (kmi->num_segments != 2) continue;
+    if (kmi->occur == NULL) continue;
+
+    if (kmi->s_len[0]==n1 && kmi->s_len[1]==n2) {
+      fprintf(stderr,"n1-n2 %d,%d\n", si1, sq1);
+      if (in_list(kmi->occur[0], si1) && in_list(kmi->occur[1], sq1)) {
+        (*fe) += kmi->intrinsic;
+        if (kmi->lig_index >= 0) {
+          (*fe) += known_ligands[kmi->lig_index].deltaG;
+        }
+        fprintf(stderr, "%s at %d+%d\n", kmi->name, si1, sq1);
+        return;
+      }
+    }
+    if (kmi->s_len[0]==n2 && kmi->s_len[1]==n1) {
+      fprintf(stderr,"n2-n1 %d,%d\n", sq1, si1);
+      if (in_list(kmi->occur[0], sq1) && in_list(kmi->occur[1], si1)) {
+        (*fe) += kmi->intrinsic;
+        if (kmi->lig_index >= 0) {
+          (*fe) += known_ligands[kmi->lig_index].deltaG;
+        }
+        fprintf(stderr, "%s at %d+%d\n", kmi->name, sq1, si1);
+        return;
+      }
+    }
+  }
+}
+
+void std_eeilcb(double* fe, int u1, int u2, int type, int type2, short si1, short sj1, short sp1, short sq1, pf_paramT *P)
+{
+  int i;
+  for (i = 0; i < num_motifs; i++) {
+    motif* kmi = known_motifs+i;
+    if (kmi->num_segments != 2) continue;
+    if (kmi->occur == NULL) continue;
+
+    if (kmi->s_len[0]==u1 && kmi->s_len[1]==u2) {
+      if (in_list(kmi->occur[0], si1) && in_list(kmi->occur[1], sq1)) {
+        (*fe) *= exp(-kmi->intrinsic*10./(P->kT));
+        if (kmi->lig_index >= 0) {
+          (*fe) *= exp(-known_ligands[kmi->lig_index].deltaG*10./(P->kT));
+        }
+        return;
+      }
+    }
+    if (kmi->s_len[0]==u2 && kmi->s_len[1]==u1) {
+      if (in_list(kmi->occur[0], sq1) && in_list(kmi->occur[1], si1)) {
+        (*fe) *= exp(-kmi->intrinsic*10./(P->kT));
+        if (kmi->lig_index >= 0) {
+          (*fe) *= exp(-known_ligands[kmi->lig_index].deltaG*10./(P->kT));
+        }
+        return;
+      }
+    }
+  }
+}
+
 
 /*--------------------------------------------------------------------------*/
 
@@ -290,6 +354,7 @@ int main(int argc, char *argv[]){
   }
 
   mfe_parameters = get_scaled_parameters(temperature, md);
+  mfe_parameters->eilcb = std_eilcb;
 
   /* set options we wanna pass to read_record */
   if(istty)             read_opt |= VRNA_INPUT_NOSKIP_BLANK_LINES;
@@ -317,6 +382,7 @@ int main(int argc, char *argv[]){
 
     length  = (int)strlen(rec_sequence);
     structure = (char *)space(sizeof(char) *(length+1));
+    detect_motifs(rec_sequence);
 
     /* parse the rest of the current dataset to obtain a structure constraint */
     if(fold_constrained){
@@ -385,6 +451,7 @@ int main(int argc, char *argv[]){
       if (cstruc!=NULL) strncpy(pf_struc, cstruc, length+1);
 
       pf_parameters = get_boltzmann_factors(temperature, betaScale, md, pf_scale);
+      pf_parameters->eeilcb = std_eeilcb;
       energy = pf_fold_par(rec_sequence, pf_struc, pf_parameters, do_backtrack, fold_constrained, circular);
 
       if(lucky){

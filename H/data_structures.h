@@ -120,6 +120,10 @@ typedef struct{
   int     canonicalBPonly;  /**<  \brief  remove non-canonical bp's from constraint structures  */
 } model_detailsT;
 
+typedef struct _il_ctx {
+  int i, j, p, q;
+} IL_CTX;
+
 struct _paramT;
 typedef struct _paramT paramT;
 typedef void (*EILCB)(int* fe, int n1, int n2, int type, int type_2, int si1, int sj1, int sp1, int sq1, paramT *P);
@@ -166,8 +170,9 @@ struct _paramT {
 
   model_detailsT model_details;   /**<  \brief  Model details to be used in the recursions */
 
-  void*   userdata;               /**<  \brief  Opaque data provided by the application */
+  IL_CTX  il_ctx;
   EILCB   eilcb;                  /**<  \brief  Application provided callback */
+  void*   userdata;               /**<  \brief  Opaque data provided by the application */
 };
 
 struct _pf_paramT;
@@ -226,8 +231,9 @@ struct _pf_paramT {
 
   model_detailsT model_details; /**<  \brief  Model details to be used in the recursions */
 
-  void*   userdata;             /**<  \brief  Opaque data provided by the application */
+  IL_CTX  il_ctx;
   EEILCB  eeilcb;               /**<  \brief  Application provided callback */
+  void*   userdata;             /**<  \brief  Opaque data provided by the application */
 };
 
 
