@@ -111,11 +111,18 @@ motif  known_motifs[] = {
 int num_motifs = sizeof(known_motifs) / sizeof(motif);
 
 
-void reset_motifs(void)
+motif* get_motifs(void)
+{
+  motif* p = (motif*) calloc(num_motifs, sizeof(motif));
+  if (p) memmove(p, known_motifs, num_motifs * sizeof(motif));
+  return p;
+}
+
+void reset_motifs(motif* mdb)
 {
   int i,k;
   for (i = 0; i < num_motifs; i++) {
-    motif* kmi = known_motifs+i;
+    motif* kmi = mdb+i;
     if (kmi->occur == NULL) continue;
     for (k = 0; k < kmi->num_segments; k++) {
       if (kmi->occur[k]) free(kmi->occur[k]);
@@ -141,14 +148,14 @@ int in_list(int* list, int val)
   return 0;
 }
 
-void detect_motifs(const char *sequence, ligand* lig_db)
+void detect_motifs(const char *sequence, motif* mdb, ligand* lig_db)
 {
   int i,j,k;
   
-  reset_motifs();
+  reset_motifs(mdb);
   
   for (i = 0; i < num_motifs; i++) {
-    motif* kmi = known_motifs+i;
+    motif* kmi = mdb+i;
     for (j = 0; j < kmi->num_segments; j++) {
       const char* p;
       const char* needle = kmi->segment[j];
@@ -172,8 +179,14 @@ void detect_motifs(const char *sequence, ligand* lig_db)
 void std_eilcb(int* fe, int n1, int n2, int type, int type_2, int si1, int sj1, int sp1, int sq1, int ii, int qq, paramT *P)
 {
   int i;
+  motif* mdb;
+  if (P && P->userdata) {
+    mdb = (motif*)P->userdata;
+  } else {
+    return;
+  }
   for (i = 0; i < num_motifs; i++) {
-    motif* kmi = known_motifs+i;
+    motif* kmi = mdb+i;
     if (kmi->num_segments != 2) continue;
     if (kmi->occur == NULL) continue;
 
@@ -205,8 +218,14 @@ void std_eilcb(int* fe, int n1, int n2, int type, int type_2, int si1, int sj1, 
 void std_eeilcb(double* fe, int u1, int u2, int type, int type2, short si1, short sj1, short sp1, short sq1, int ii, int qq, pf_paramT *P)
 {
   int i;
+  motif* mdb;
+  if (P && P->userdata) {
+    mdb = (motif*)P->userdata;
+  } else {
+    return;
+  }
   for (i = 0; i < num_motifs; i++) {
-    motif* kmi = known_motifs+i;
+    motif* kmi = mdb+i;
     if (kmi->num_segments != 2) continue;
     if (kmi->occur == NULL) continue;
 
@@ -247,6 +266,7 @@ int main(int argc, char *argv[]){
   paramT          *mfe_parameters;
   pf_paramT       *pf_parameters;
   model_detailsT  md;
+  motif         *motifdb;
   ligand        *ligdb;
 
   rec_type      = read_opt = 0;
@@ -458,7 +478,9 @@ int main(int argc, char *argv[]){
     /* convert sequence to uppercase letters only */
     str_uppercase(rec_sequence);
     /* detect motifs and aptamers */
-    detect_motifs(rec_sequence, ligdb);
+    motifdb = get_motifs();
+    detect_motifs(rec_sequence, motifdb, ligdb);
+    mfe_parameters->userdata = motifdb;
 
     if(istty) printf("length = %d\n", length);
 
@@ -507,6 +529,8 @@ int main(int argc, char *argv[]){
 
       pf_parameters = get_boltzmann_factors(temperature, betaScale, md, pf_scale);
       pf_parameters->eeilcb = std_eeilcb;
+      pf_parameters->userdata = motifdb;
+
       energy = pf_fold_par(rec_sequence, pf_struc, pf_parameters, do_backtrack, fold_constrained, circular);
 
       if(lucky){
@@ -621,6 +645,8 @@ int main(int argc, char *argv[]){
     }
     rec_id = rec_sequence = structure = cstruc = NULL;
     rec_rest = NULL;
+    reset_motifs(motifdb);
+    free(motifdb);
 
     /* print user help for the next round if we get input from tty */
     if(istty){
