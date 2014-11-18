@@ -20,6 +20,7 @@
 #include "read_epars.h"
 #include "subopt.h"
 #include "params.h"
+#include "motifs.h"
 #include "RNAsubopt_cmdl.h"
 
 /*@unused@*/
@@ -40,7 +41,9 @@ int main(int argc, char *argv[]){
   paramT          *P;
   pf_paramT       *pf_parameters;
   model_detailsT  md;
-
+  motif           *motifdb;
+  ligand          *ligdb;
+    
   do_backtrack  = 1;
   dangles       = 2;
   betaScale     = 1.;
@@ -53,8 +56,11 @@ int main(int argc, char *argv[]){
   input_string  = c = cstruc = structure = ParamFile = ns_bases = NULL;
   pf_parameters = NULL;
   P             = NULL;
+  motifdb       = NULL;
+  ligdb         = NULL;
 
   set_model_details(&md);
+  ligdb = get_ligands();
 
   /*
   #############################################
@@ -137,6 +143,24 @@ int main(int argc, char *argv[]){
     warn_user("G-quadruplex support for stochastic backtracking not implemented yet");
     RNAsubopt_cmdline_parser_print_help();
     exit(1);
+  }
+
+  /* Ligands */
+  if(args_info.ligand_given){
+    int i;
+    for (i = 0; i < args_info.ligand_given; ++i) {
+      FLT_OR_DBL cc;
+      char *p;
+      char *buf = strdup(args_info.ligand_arg[i]);
+      while(p=strchr(args_info.ligand_arg[i],':')) (*p) = ' ';
+      if (sscanf(args_info.ligand_arg[i], "%s %lf", buf, &cc) != 2) {
+        nrerror("Invalid ligand input");
+      }
+      if (set_ligand(ligdb, buf, cc) < 0) {
+        warn_user("Unknown ligand");
+      }
+      free(buf);
+    }
   }
 
   /* free allocated memory of command line data structure */
@@ -239,7 +263,11 @@ int main(int argc, char *argv[]){
     orig_sequence = strdup(rec_sequence);
     /* convert sequence to uppercase letters only */
     str_uppercase(rec_sequence);
-
+    /* detect motifs and aptamers */
+    motifdb = get_motifs();
+    detect_motifs(rec_sequence, motifdb, ligdb);
+    setup_motifs_for_params(P, motifdb);
+                
     if(istty){
       if (cut_point == -1)
         printf("length = %d\n", length);
@@ -273,6 +301,7 @@ int main(int argc, char *argv[]){
       strncpy(ss, structure, length);
 
       pf_parameters = get_boltzmann_factors(temperature, betaScale, md, pf_scale);
+      setup_motifs_for_pf_params(pf_parameters, motifdb);
       /* ignore return value, we are not interested in the free energy */
       (void) pf_fold_par(rec_sequence, ss, pf_parameters, do_backtrack, fold_constrained, circular);
       free(ss);
@@ -332,6 +361,8 @@ int main(int argc, char *argv[]){
     }
     rec_id = rec_sequence = orig_sequence = structure = cstruc = NULL;
     rec_rest = NULL;
+    reset_motifs(motifdb);
+    free(motifdb);
 
     /* print user help for the next round if we get input from tty */
     if(istty){
