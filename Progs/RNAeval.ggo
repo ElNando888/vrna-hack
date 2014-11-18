@@ -87,5 +87,12 @@ details="This option does not effect structure generation, only the energies tha
 flag
 off
 
+option "ligand" -
+"Adds a ligand in the solution\n"
+string
+optional
+multiple
+hidden
+
 text    "\nIf in doubt our program is right, nature is at fault.\nComments should be sent to\
  rna@tbi.univie.ac.at.\n"

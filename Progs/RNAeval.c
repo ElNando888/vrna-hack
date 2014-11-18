@@ -16,6 +16,8 @@
 #include "fold.h"
 #include "utils.h"
 #include "read_epars.h"
+#include "params.h"
+#include "motifs.h"
 #include "RNAeval_cmdl.h"
 
 #ifdef __GNUC__
@@ -43,10 +45,17 @@ int main(int argc, char *argv[]){
   int                       noconv=0;
   int                       verbose = 0;
   unsigned int              rec_type, read_opt;
+  paramT                    *P;
+  model_detailsT            md;
+  motif                     *motifdb;
+  ligand                    *ligdb;
 
   string  = orig_sequence = ParamFile = NULL;
   gquad   = 0;
   dangles = 2;
+
+  set_model_details(&md);
+  ligdb = get_ligands();
 
   /*
   #############################################
@@ -79,6 +88,24 @@ int main(int argc, char *argv[]){
   if(args_info.verbose_given)     verbose = 1;
   /* gquadruplex support */
   if(args_info.gquad_given)       gquad = 1;
+  /* Ligands */
+  if(args_info.ligand_given){
+    int i;
+    for (i = 0; i < args_info.ligand_given; ++i) {
+      FLT_OR_DBL cc;
+      char *p;
+      char *buf = strdup(args_info.ligand_arg[i]);
+      while(p=strchr(args_info.ligand_arg[i],':')) (*p) = ' ';
+      if (sscanf(args_info.ligand_arg[i], "%s %lf", buf, &cc) != 2) {
+        nrerror("Invalid ligand input");
+      }
+      if (set_ligand(ligdb, buf, cc) < 0) {
+        warn_user("Unknown ligand");
+      }
+      free(buf);
+    }
+  }
+
 
   /* free allocated memory of command line data structure */
   RNAeval_cmdline_parser_free (&args_info);
@@ -99,6 +126,8 @@ int main(int argc, char *argv[]){
   if(circular && gquad){
     nrerror("G-Quadruplex support is currently not available for circular RNA structures");
   }
+
+  P = get_scaled_parameters(temperature, md);
 
   /* set options we wanna pass to read_record */
   if(istty){
@@ -144,6 +173,10 @@ int main(int argc, char *argv[]){
     orig_sequence = strdup(string);
     /* convert sequence to uppercase letters only */
     str_uppercase(string);
+    /* detect motifs and aptamers */
+    motifdb = get_motifs();
+    detect_motifs(rec_sequence, motifdb, ligdb);
+    setup_motifs_for_params(P, motifdb);
 
     if(istty){
       if (cut_point == -1)
@@ -155,7 +188,7 @@ int main(int argc, char *argv[]){
     if(gquad)
       energy = energy_of_gquad_structure(string, structure, verbose);
     else
-      energy = (circular) ? energy_of_circ_structure(string, structure, verbose) : energy_of_structure(string, structure, verbose);
+      energy = (circular) ? energy_of_circ_structure(string, structure, verbose) : energy_of_struct_par(string, structure, P, verbose);
 
     if (cut_point == -1)
       printf("%s\n%s", orig_sequence, structure);
@@ -184,6 +217,8 @@ int main(int argc, char *argv[]){
     }
     rec_id = rec_sequence = structure = NULL;
     rec_rest = NULL;
+    reset_motifs(motifdb);
+    free(motifdb);
 
     free(string);
     free(orig_sequence);
@@ -195,6 +230,8 @@ int main(int argc, char *argv[]){
                               "Input sequence (upper or lower case) followed by structure");
     }
   }
+
+  free(P);
   return EXIT_SUCCESS;
 }
 
