@@ -27,229 +27,13 @@
 #include "read_epars.h"
 #include "MEA.h"
 #include "params.h"
+#include "motifs.h"
 #include "RNAfold_cmdl.h"
 
 
 
 /*@unused@*/
 static char UNUSED rcsid[] = "$Id: RNAfold.c,v 1.25 2009/02/24 14:22:21 ivo Exp $";
-
-/*--------------------------------------------------------------------------*/
-/* Motifs/ligands related stuff                                             */
-/* Temporary located here, some of the following code will probably end up  */
-/* in (a) separate file(S)                                                  */
-/*--------------------------------------------------------------------------*/
-
-typedef struct _ligand {
-  /* static fields */
-  const char *name;
-  FLT_OR_DBL Kd;
-  /* runtime */
-  FLT_OR_DBL conc;        /* in micromolars */ 
-  int        deltaG;      /* in dcal/mol    */
-} ligand;
-
-typedef struct _motif {
-  /* static fields */
-  const char *name;
-  unsigned   num_segments;
-  const char **segment;   /* for matching against the sequence */
-  int        *s_ofs;      /* offset from th matched substring */
-  int        *s_len;      /* for comparison in the callbacks */
-  int        intrinsic;   /* in dcal/mol, estimated deviation from the model */
-  int        lig_index;   /* which ligand, if any */
-  /* runtime */
-  int        **occur;
-  int        deltaG;      /* in dcal/mol */
-} motif;
-
-
-ligand known_ligands[] = {
-  {"FMN", 3.0, 0., 0}
-};
-
-enum {
-  _FMN,
-  _NONE = -1
-};
-
-int num_ligands = sizeof(known_ligands) / sizeof(ligand);
-
-#if 1
-#define _RT (-(temperature+K0)*GASCONST/1000.)
-#else
-#define _RT -0.6
-#endif
-
-int set_ligand(ligand* lig_db, const char* lname, FLT_OR_DBL concentration)
-{
-  int i;
-  for (i=0; i < num_ligands; i++) {
-    ligand* kli = lig_db+i;
-    if (strcmp(lname, kli->name)!=0) continue;
-    kli->conc = concentration;
-    kli->deltaG = 100. * (_RT * log(concentration / kli->Kd));
-    if (0) fprintf(stderr,"Ligand %s, dG %d dcal/mol\n", kli->name, kli->deltaG);
-    return i;
-  }
-  return -1;
-}
-
-ligand* get_ligands(void)
-{
-  ligand* p = (ligand*) calloc(num_ligands, sizeof(ligand));
-  if (p) memmove(p, known_ligands, num_ligands * sizeof(ligand));
-  return p;
-}
-
-/* TODO: retrieve these from a file */
-motif  known_motifs[] = {
-  {"FMN aptamer", 2, (const char *[]){"AGGAUA","GAAGG"}, (int[]){0,0}, (int[]){6,5}, 0, _FMN, NULL},
-  {"Sarcin-ricin (example)", 2, (const char*[]){"CCAGUA","GAACA"}, (int[]){0,0}, (int[]){6,5}, -250, _NONE, NULL}
-};
-
-int num_motifs = sizeof(known_motifs) / sizeof(motif);
-
-
-motif* get_motifs(void)
-{
-  motif* p = (motif*) calloc(num_motifs, sizeof(motif));
-  if (p) memmove(p, known_motifs, num_motifs * sizeof(motif));
-  return p;
-}
-
-void reset_motifs(motif* mdb)
-{
-  int i,k;
-  for (i = 0; i < num_motifs; i++) {
-    motif* kmi = mdb+i;
-    if (kmi->occur == NULL) continue;
-    for (k = 0; k < kmi->num_segments; k++) {
-      if (kmi->occur[k]) free(kmi->occur[k]);
-    }
-    free(kmi->occur);
-    kmi->occur = NULL;
-    kmi->deltaG = 0;
-  }
-}
-
-void add_list(int* list, int val)
-{
-  int size = 1+list[0];
-  list = realloc(list, (size+1)*sizeof(int));
-  list[0]++;
-  list[list[0]] = val;
-}
-
-int in_list(int* list, int val)
-{
-  int i;
-  for(i=1; i<=list[0]; i++) if (list[i]==val) return i;
-  return 0;
-}
-
-void detect_motifs(const char *sequence, motif* mdb, ligand* lig_db)
-{
-  int i,j,k;
-  
-  reset_motifs(mdb);
-  
-  for (i = 0; i < num_motifs; i++) {
-    motif* kmi = mdb+i;
-    for (j = 0; j < kmi->num_segments; j++) {
-      const char* p;
-      const char* needle = kmi->segment[j];
-      for (p = strstr(sequence, needle); p; p = strstr(p+1, needle)) {
-        int ofs = p - sequence;
-        if (!ofs) continue;
-        if (kmi->occur == NULL) {
-          kmi->occur = (int**)calloc(kmi->num_segments, sizeof(int*));
-          for (k = 0; k < kmi->num_segments; k++) {
-            kmi->occur[k] = (int*)calloc(1, sizeof(int));
-          }
-        }
-        if (0) fprintf(stderr,"%s[%d] found at %d\n", kmi->name, j, ofs+1);
-        add_list(kmi->occur[j], ofs+1 + kmi->s_ofs[j]);
-        if (kmi->lig_index >= 0) kmi->deltaG = lig_db[kmi->lig_index].deltaG;
-      }
-    }
-  }
-}
-
-void std_eilcb(int* fe, int n1, int n2, int type, int type_2, int si1, int sj1, int sp1, int sq1, int ii, int qq, paramT *P)
-{
-  int i;
-  motif* mdb;
-  if (P && P->userdata) {
-    mdb = (motif*)P->userdata;
-  } else {
-    return;
-  }
-  for (i = 0; i < num_motifs; i++) {
-    motif* kmi = mdb+i;
-    if (kmi->num_segments != 2) continue;
-    if (kmi->occur == NULL) continue;
-
-    if (kmi->s_len[0]==n1 && kmi->s_len[1]==n2) {
-      if (0) fprintf(stderr,"n1-n2 %d,%d\n", ii, qq);
-      if (in_list(kmi->occur[0], ii) && in_list(kmi->occur[1], qq)) {
-        (*fe) += kmi->intrinsic;
-        if (kmi->lig_index >= 0) {
-          (*fe) += kmi->deltaG;
-        }
-        if (0) fprintf(stderr, "%s at %d+%d\n", kmi->name, ii, qq);
-        return;
-      }
-    }
-    if (kmi->s_len[0]==n2 && kmi->s_len[1]==n1) {
-      if (0) fprintf(stderr,"n2-n1 %d,%d\n", qq, ii);
-      if (in_list(kmi->occur[0], qq) && in_list(kmi->occur[1], ii)) {
-        (*fe) += kmi->intrinsic;
-        if (kmi->lig_index >= 0) {
-          (*fe) += kmi->deltaG;
-        }
-        if (0) fprintf(stderr, "%s at %d+%d\n", kmi->name, qq, ii);
-        return;
-      }
-    }
-  }
-}
-
-void std_eeilcb(double* fe, int u1, int u2, int type, int type2, short si1, short sj1, short sp1, short sq1, int ii, int qq, pf_paramT *P)
-{
-  int i;
-  motif* mdb;
-  if (P && P->userdata) {
-    mdb = (motif*)P->userdata;
-  } else {
-    return;
-  }
-  for (i = 0; i < num_motifs; i++) {
-    motif* kmi = mdb+i;
-    if (kmi->num_segments != 2) continue;
-    if (kmi->occur == NULL) continue;
-
-    if (kmi->s_len[0]==u1 && kmi->s_len[1]==u2) {
-      if (in_list(kmi->occur[0], ii) && in_list(kmi->occur[1], qq)) {
-        (*fe) *= exp(-kmi->intrinsic*10./(P->kT));
-        if (kmi->lig_index >= 0) {
-          (*fe) *= exp(-kmi->deltaG*10./(P->kT));
-        }
-        return;
-      }
-    }
-    if (kmi->s_len[0]==u2 && kmi->s_len[1]==u1) {
-      if (in_list(kmi->occur[0], qq) && in_list(kmi->occur[1], ii)) {
-        (*fe) *= exp(-kmi->intrinsic*10./(P->kT));
-        if (kmi->lig_index >= 0) {
-          (*fe) *= exp(-kmi->deltaG*10./(P->kT));
-        }
-        return;
-      }
-    }
-  }
-}
-
 
 /*--------------------------------------------------------------------------*/
 
@@ -428,7 +212,6 @@ int main(int argc, char *argv[]){
   }
 
   mfe_parameters = get_scaled_parameters(temperature, md);
-  mfe_parameters->eilcb = std_eilcb;
 
   /* set options we wanna pass to read_record */
   if(istty)             read_opt |= VRNA_INPUT_NOSKIP_BLANK_LINES;
@@ -480,7 +263,7 @@ int main(int argc, char *argv[]){
     /* detect motifs and aptamers */
     motifdb = get_motifs();
     detect_motifs(rec_sequence, motifdb, ligdb);
-    mfe_parameters->userdata = motifdb;
+    setup_motifs_for_params(mfe_parameters, motifdb);
 
     if(istty) printf("length = %d\n", length);
 
@@ -528,8 +311,7 @@ int main(int argc, char *argv[]){
       if (cstruc!=NULL) strncpy(pf_struc, cstruc, length+1);
 
       pf_parameters = get_boltzmann_factors(temperature, betaScale, md, pf_scale);
-      pf_parameters->eeilcb = std_eeilcb;
-      pf_parameters->userdata = motifdb;
+      setup_motifs_for_pf_params(pf_parameters, motifdb);
 
       energy = pf_fold_par(rec_sequence, pf_struc, pf_parameters, do_backtrack, fold_constrained, circular);
 

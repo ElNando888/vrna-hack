@@ -1,4 +1,6 @@
-
+autom4te.cache
+*/autom4te.cache
+RNAforester/g2-0.70/autom4te.cache/*
 config.h
 *.Po
 stamp-h1
@@ -16,6 +18,7 @@ man/cmdlopt.sh
 RNAforester/g2-0.70/demo/Makefile
 RNAforester/g2-0.70/g2_perl/Makefile.PL
 RNAforester/g2-0.70/Makefile
+RNAforester/compile
 *.o
 *.a
 Progs/RNA2Dfold
@@ -45,3 +48,9 @@ Utils/ct2db
 Utils/popt
 
 rna.ps
+
+*.0
+
+*.1
+
+RNAforester/g2-0.70/autom4te.cache/requests
