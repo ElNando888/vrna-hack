@@ -1,6 +1,9 @@
-/* Motifs/ligands related stuff                                             */
-/* Temporary located here, some of the following code will probably end up  */
-/* in (a) separate file(S)                                                  */
+/*
+                  Motifs, aptamers and ligands
+                  
+                  F Portela
+                  Vienna RNA "hack"
+*/
 
 #include <stdio.h> 
 #include <stdlib.h>
