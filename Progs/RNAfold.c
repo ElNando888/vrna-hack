@@ -60,6 +60,7 @@ typedef struct _motif {
   int        lig_index;   /* which ligand, if any */
   /* runtime */
   int        **occur;
+  int        deltaG;      /* in dcal/mol */
 } motif;
 
 
@@ -80,11 +81,11 @@ int num_ligands = sizeof(known_ligands) / sizeof(ligand);
 #define _RT -0.6
 #endif
 
-int set_ligand( const char* lname, FLT_OR_DBL concentration )
+int set_ligand(ligand* lig_db, const char* lname, FLT_OR_DBL concentration)
 {
   int i;
   for (i=0; i < num_ligands; i++) {
-    ligand* kli = known_ligands+i;
+    ligand* kli = lig_db+i;
     if (strcmp(lname, kli->name)!=0) continue;
     kli->conc = concentration;
     kli->deltaG = 100. * (_RT * log(concentration / kli->Kd));
@@ -94,6 +95,12 @@ int set_ligand( const char* lname, FLT_OR_DBL concentration )
   return -1;
 }
 
+ligand* get_ligands(void)
+{
+  ligand* p = (ligand*) calloc(num_ligands, sizeof(ligand));
+  if (p) memmove(p, known_ligands, num_ligands * sizeof(ligand));
+  return p;
+}
 
 /* TODO: retrieve these from a file */
 motif  known_motifs[] = {
@@ -108,12 +115,14 @@ void reset_motifs(void)
 {
   int i,k;
   for (i = 0; i < num_motifs; i++) {
-    if (known_motifs[i].occur == NULL) continue;
-    for (k=0; k < known_motifs[i].num_segments; k++) {
-      if (known_motifs[i].occur[k]) free(known_motifs[i].occur[k]);
+    motif* kmi = known_motifs+i;
+    if (kmi->occur == NULL) continue;
+    for (k = 0; k < kmi->num_segments; k++) {
+      if (kmi->occur[k]) free(kmi->occur[k]);
     }
-    free(known_motifs[i].occur);
-    known_motifs[i].occur = NULL;
+    free(kmi->occur);
+    kmi->occur = NULL;
+    kmi->deltaG = 0;
   }
 }
 
@@ -132,27 +141,29 @@ int in_list(int* list, int val)
   return 0;
 }
 
-void detect_motifs(const char *sequence)
+void detect_motifs(const char *sequence, ligand* lig_db)
 {
   int i,j,k;
   
   reset_motifs();
   
   for (i = 0; i < num_motifs; i++) {
-    for (j=0; j < known_motifs[i].num_segments; j++) {
+    motif* kmi = known_motifs+i;
+    for (j = 0; j < kmi->num_segments; j++) {
       const char* p;
-      const char* needle = known_motifs[i].segment[j];
+      const char* needle = kmi->segment[j];
       for (p = strstr(sequence, needle); p; p = strstr(p+1, needle)) {
         int ofs = p - sequence;
         if (!ofs) continue;
-        if (known_motifs[i].occur == NULL) {
-          known_motifs[i].occur = (int**)calloc(known_motifs[i].num_segments, sizeof(int*));
-          for (k=0; k < known_motifs[i].num_segments; k++) {
-            known_motifs[i].occur[k] = (int*)calloc(1, sizeof(int));
+        if (kmi->occur == NULL) {
+          kmi->occur = (int**)calloc(kmi->num_segments, sizeof(int*));
+          for (k = 0; k < kmi->num_segments; k++) {
+            kmi->occur[k] = (int*)calloc(1, sizeof(int));
           }
         }
-        if (0) fprintf(stderr,"%s[%d] found at %d\n", known_motifs[i].name, j, ofs+1);
-        add_list(known_motifs[i].occur[j], ofs+1 + known_motifs[i].s_ofs[j]);
+        if (0) fprintf(stderr,"%s[%d] found at %d\n", kmi->name, j, ofs+1);
+        add_list(kmi->occur[j], ofs+1 + kmi->s_ofs[j]);
+        if (kmi->lig_index >= 0) kmi->deltaG = lig_db[kmi->lig_index].deltaG;
       }
     }
   }
@@ -171,7 +182,7 @@ void std_eilcb(int* fe, int n1, int n2, int type, int type_2, int si1, int sj1, 
       if (in_list(kmi->occur[0], ii) && in_list(kmi->occur[1], qq)) {
         (*fe) += kmi->intrinsic;
         if (kmi->lig_index >= 0) {
-          (*fe) += known_ligands[kmi->lig_index].deltaG;
+          (*fe) += kmi->deltaG;
         }
         if (0) fprintf(stderr, "%s at %d+%d\n", kmi->name, ii, qq);
         return;
@@ -182,7 +193,7 @@ void std_eilcb(int* fe, int n1, int n2, int type, int type_2, int si1, int sj1, 
       if (in_list(kmi->occur[0], qq) && in_list(kmi->occur[1], ii)) {
         (*fe) += kmi->intrinsic;
         if (kmi->lig_index >= 0) {
-          (*fe) += known_ligands[kmi->lig_index].deltaG;
+          (*fe) += kmi->deltaG;
         }
         if (0) fprintf(stderr, "%s at %d+%d\n", kmi->name, qq, ii);
         return;
@@ -203,7 +214,7 @@ void std_eeilcb(double* fe, int u1, int u2, int type, int type2, short si1, shor
       if (in_list(kmi->occur[0], ii) && in_list(kmi->occur[1], qq)) {
         (*fe) *= exp(-kmi->intrinsic*10./(P->kT));
         if (kmi->lig_index >= 0) {
-          (*fe) *= exp(-known_ligands[kmi->lig_index].deltaG*10./(P->kT));
+          (*fe) *= exp(-kmi->deltaG*10./(P->kT));
         }
         return;
       }
@@ -212,7 +223,7 @@ void std_eeilcb(double* fe, int u1, int u2, int type, int type2, short si1, shor
       if (in_list(kmi->occur[0], qq) && in_list(kmi->occur[1], ii)) {
         (*fe) *= exp(-kmi->intrinsic*10./(P->kT));
         if (kmi->lig_index >= 0) {
-          (*fe) *= exp(-known_ligands[kmi->lig_index].deltaG*10./(P->kT));
+          (*fe) *= exp(-kmi->deltaG*10./(P->kT));
         }
         return;
       }
@@ -236,6 +247,7 @@ int main(int argc, char *argv[]){
   paramT          *mfe_parameters;
   pf_paramT       *pf_parameters;
   model_detailsT  md;
+  ligand        *ligdb;
 
   rec_type      = read_opt = 0;
   rec_id        = buf = rec_sequence = structure = cstruc = orig_sequence = NULL;
@@ -243,6 +255,7 @@ int main(int argc, char *argv[]){
   ParamFile     = NULL;
   ns_bases      = NULL;
   pf_parameters = NULL;
+  ligdb         = NULL;
   do_backtrack  = 1;
   pf            = 0;
   sfact         = 1.07;
@@ -260,6 +273,7 @@ int main(int argc, char *argv[]){
   betaScale     = 1.;
 
   set_model_details(&md);
+  ligdb = get_ligands();
 
 
   /*
@@ -336,7 +350,7 @@ int main(int argc, char *argv[]){
       if (sscanf(args_info.ligand_arg[i], "%s %lf", buf, &cc) != 2) {
         nrerror("Invalid ligand input");
       }
-      if (set_ligand(buf, cc) < 0) {
+      if (set_ligand(ligdb, buf, cc) < 0) {
         warn_user("Unknown ligand");
       }
       free(buf);
@@ -422,7 +436,6 @@ int main(int argc, char *argv[]){
 
     length  = (int)strlen(rec_sequence);
     structure = (char *)space(sizeof(char) *(length+1));
-    detect_motifs(rec_sequence);
 
     /* parse the rest of the current dataset to obtain a structure constraint */
     if(fold_constrained){
@@ -444,6 +457,8 @@ int main(int argc, char *argv[]){
     orig_sequence = strdup(rec_sequence);
     /* convert sequence to uppercase letters only */
     str_uppercase(rec_sequence);
+    /* detect motifs and aptamers */
+    detect_motifs(rec_sequence, ligdb);
 
     if(istty) printf("length = %d\n", length);
 
