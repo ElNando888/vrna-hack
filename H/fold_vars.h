@@ -163,6 +163,9 @@ extern FLT_OR_DBL *pr;
  *  \deprecated Do not use this variable anymore!
  */
 extern int   *iindx;
+#ifdef _OPENMP
+#pragma omp threadprivate(iindx)
+#endif
 
 /**
  *  \brief A scaling factor used by pf_fold() to avoid overflows.
