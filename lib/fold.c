@@ -1371,7 +1371,7 @@ PUBLIC float energy_of_struct_par(const char *string,
 
   pair_table = make_pair_table(structure);
 
-  energy = energy_of_structure_pt(string, pair_table, S, S1, verbosity_level);
+  energy = energy_of_struct_pt_par(string, pair_table, S, S1, parameters, verbosity_level);
 
   free(pair_table);
   free(S); free(S1);
