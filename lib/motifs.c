@@ -17,11 +17,15 @@
 #define PUBLIC
 #define PRIVATE static
 
+typedef enum {false, true} bool;
+
 /*--------------------------------------------------------------------------*/
 
 PRIVATE ligand known_ligands[] = {
   {"FMN", 3.0, 0., 0}
 };
+
+int num_ligands = sizeof(known_ligands) / sizeof(ligand);
 
 enum {
   _FMN,
@@ -34,10 +38,9 @@ PRIVATE motif  known_motifs[] = {
   {"Sarcin-ricin (example)", 2, (const char*[]){"CCAGUA","GAACA"}, (int[]){0,0}, (int[]){6,5}, -250, _NONE, NULL}
 };
 
+int num_motifs = sizeof(known_motifs) / sizeof(motif);
+
 /*--------------------------------------------------------------------------*/
-
-
-int num_ligands = sizeof(known_ligands) / sizeof(ligand);
 
 #if 1
 #define _RT (-(temperature+K0)*GASCONST/1000.)
@@ -59,14 +62,13 @@ PUBLIC int set_ligand(ligand* lig_db, const char* lname, FLT_OR_DBL concentratio
   return -1;
 }
 
+
 PUBLIC ligand* get_ligands(void)
 {
   ligand* p = (ligand*) calloc(num_ligands, sizeof(ligand));
   if (p) memmove(p, known_ligands, num_ligands * sizeof(ligand));
   return p;
 }
-
-int num_motifs = sizeof(known_motifs) / sizeof(motif);
 
 
 PUBLIC motif* get_motifs(void)
@@ -75,6 +77,7 @@ PUBLIC motif* get_motifs(void)
   if (p) memmove(p, known_motifs, num_motifs * sizeof(motif));
   return p;
 }
+
 
 PUBLIC void reset_motifs(motif* mdb)
 {
@@ -91,6 +94,7 @@ PUBLIC void reset_motifs(motif* mdb)
   }
 }
 
+
 PRIVATE void add_list(int* list, int val)
 {
   int size = 1+list[0];
@@ -99,12 +103,47 @@ PRIVATE void add_list(int* list, int val)
   list[list[0]] = val;
 }
 
+
 PRIVATE int in_list(int* list, int val)
 {
   int i;
   for(i=1; i<=list[0]; i++) if (list[i]==val) return i;
   return 0;
 }
+
+
+PRIVATE bool iupac_cmp(const char nt, const char mask)
+{
+  char* p = NULL;
+  switch(nt) {
+  case 'A': p = strchr("ARMVHDN", mask); break;
+  case 'U': p = strchr("UYKBHDN", mask); break;
+  case 'G': p = strchr("GRKBVDN", mask); break;
+  case 'C': p = strchr("CYMBVHN", mask); break;
+  }
+  return (p != NULL);
+}
+
+/* we may want to add this one to utils.c some day... 
+ */
+PRIVATE const char* iupac_match(const char* seq, const char* iupac_mask)
+{
+  const char *a, *b;
+
+  b = iupac_mask;
+  if (*b == 0) return seq;
+  for ( ; *seq != 0; seq++) {
+    if (!iupac_cmp(*seq, *b)) continue;
+    a = seq;
+    while (1) {
+      if (*b == 0) return seq;
+      if (!iupac_cmp(*a++, *b++)) break;
+    }
+    b = iupac_mask;
+  }
+  return NULL;
+}
+
 
 PUBLIC void detect_motifs(const char *sequence, motif* mdb, ligand* lig_db)
 {
@@ -117,7 +156,7 @@ PUBLIC void detect_motifs(const char *sequence, motif* mdb, ligand* lig_db)
     for (j = 0; j < kmi->num_segments; j++) {
       const char* p;
       const char* needle = kmi->segment[j];
-      for (p = strstr(sequence, needle); p; p = strstr(p+1, needle)) {
+      for (p = iupac_match(sequence, needle); p; p = iupac_match(p+1, needle)) {
         int ofs = p - sequence;
         if (!ofs) continue;
         if (kmi->occur == NULL) {
@@ -133,6 +172,7 @@ PUBLIC void detect_motifs(const char *sequence, motif* mdb, ligand* lig_db)
     }
   }
 }
+
 
 PRIVATE void std_eilcb(int* fe, int n1, int n2, int type, int type_2, int si1, int sj1, int sp1, int sq1, int ii, int qq, paramT *P)
 {
@@ -172,6 +212,7 @@ PRIVATE void std_eilcb(int* fe, int n1, int n2, int type, int type_2, int si1, i
     }
   }
 }
+
 
 PRIVATE void std_eeilcb(double* fe, int u1, int u2, int type, int type2, short si1, short sj1, short sp1, short sq1, int ii, int qq, pf_paramT *P)
 {
@@ -216,6 +257,7 @@ PUBLIC void setup_motifs_for_params(paramT* P, motif* mdb)
     P->eilcb = std_eilcb;
   }
 }
+
 
 PUBLIC void setup_motifs_for_pf_params(pf_paramT* P, motif* mdb)
 {
