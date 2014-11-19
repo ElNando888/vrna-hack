@@ -116,10 +116,10 @@ PRIVATE bool iupac_cmp(const char nt, const char mask)
 {
   char* p = NULL;
   switch(nt) {
-  case 'A': p = strchr("ARMVHDN", mask); break;
-  case 'U': p = strchr("UYKBHDN", mask); break;
-  case 'G': p = strchr("GRKBVDN", mask); break;
-  case 'C': p = strchr("CYMBVHN", mask); break;
+  case 'A': p = strchr("ARMWVHDN", mask); break;
+  case 'U': p = strchr("UYKWBHDN", mask); break;
+  case 'G': p = strchr("GRKSBVDN", mask); break;
+  case 'C': p = strchr("CYMSBVHN", mask); break;
   }
   return (p != NULL);
 }
