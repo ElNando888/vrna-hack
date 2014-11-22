@@ -34,7 +34,7 @@ enum {
 
 /* TODO: retrieve these from a file */
 PRIVATE motif  known_motifs[] = {
-  {"FMN aptamer", 2, (const char *[]){"AGGAUA","GAAGG"}, (int[]){0,0}, (int[]){6,5}, 0, _FMN, NULL},
+  {"FMN aptamer", 2, (const char *[]){"AGGAUA","GAAGG"}, (int[]){0,0}, (int[]){6,5}, -146, _FMN, NULL},
   {"Sarcin-ricin (example)", 2, (const char*[]){"CCAGUA","GAACA"}, (int[]){0,0}, (int[]){6,5}, -250, _NONE, NULL}
 };
 
