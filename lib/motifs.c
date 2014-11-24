@@ -22,19 +22,25 @@ typedef enum {false, true} bool;
 /*--------------------------------------------------------------------------*/
 
 PRIVATE ligand known_ligands[] = {
-  {"FMN", 3.0, 0., 0}
+  {"FMN", 3.0, 0., 0},
+  {"TEP", 0.32, 0., 0}
 };
 
 int num_ligands = sizeof(known_ligands) / sizeof(ligand);
 
 enum {
   _FMN,
+  _TEP,
   _NONE = -1
 };
 
 /* TODO: retrieve these from a file */
 PRIVATE motif  known_motifs[] = {
+  // .intrinsic estimated from R91 results
   {"FMN aptamer", 2, (const char *[]){"AGGAUA","GAAGG"}, (int[]){0,0}, (int[]){6,5}, -146, _FMN, NULL},
+  // .intrinsic probably much stronger than that
+  {"TEP aptamer", 2, (const char *[]){"CCUUGGCAG","AUACCA"}, (int[]){0,0}, (int[]){9,6}, -441, _TEP, NULL},
+  // meant for tests, no experimental data (so far) to support the .intrinsic value below
   {"Sarcin-ricin (example)", 2, (const char*[]){"CCAGUA","GAACA"}, (int[]){0,0}, (int[]){6,5}, -250, _NONE, NULL}
 };
 
