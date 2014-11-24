@@ -37,7 +37,7 @@ enum {
 /* TODO: retrieve these from a file */
 PRIVATE motif  known_motifs[] = {
   // .intrinsic estimated from R91 results
-  {"FMN aptamer", 2, (const char *[]){"AGGAUA","GAAGG"}, (int[]){0,0}, (int[]){6,5}, -146, _FMN, NULL},
+  {"FMN aptamer", 2, (const char *[]){"AGGAUA","GAAGG"}, (int[]){0,0}, (int[]){6,5}, -186, _FMN, NULL},
   // .intrinsic probably much stronger than that
   {"TEP aptamer", 2, (const char *[]){"CCUUGGCAG","AUACCA"}, (int[]){0,0}, (int[]){9,6}, -441, _TEP, NULL},
   // meant for tests, no experimental data (so far) to support the .intrinsic value below
