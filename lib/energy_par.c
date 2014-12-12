@@ -62,10 +62,10 @@ PUBLIC double Tmeasure = 37+K0;  /* temperature of param measurements */
 
 /* PUBLIC double lxc37=107.9; */
 PUBLIC double lxc37=107.856;
-PUBLIC int ML_intern37=-90;
-PUBLIC int ML_interndH=-220;
-PUBLIC int ML_closing37=930;
-PUBLIC int ML_closingdH=3000;
+PUBLIC int ML_intern37=-60;   /* was -90 */
+PUBLIC int ML_interndH=-1190; /* was -220 */
+PUBLIC int ML_closing37=930;  /* looks correct */
+PUBLIC int ML_closingdH=3890; /* ws 3000 */
 PUBLIC int ML_BASE37=0;
 PUBLIC int ML_BASEdH=0;
 PUBLIC int MAX_NINIO=300;
