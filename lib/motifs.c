@@ -22,8 +22,8 @@ typedef enum {false, true} bool;
 /*--------------------------------------------------------------------------*/
 
 PRIVATE ligand known_ligands[] = {
-  {"FMN", 3.0, 0., 0},
-  {"TEP", 0.32, 0., 0}
+  {"FMN", 0.},
+  {"TEP", 0.}
 };
 
 int num_ligands = sizeof(known_ligands) / sizeof(ligand);
@@ -37,11 +37,12 @@ enum {
 /* TODO: retrieve these from a file */
 PRIVATE motif  known_motifs[] = {
   // .intrinsic estimated from R91 experimental results
-  {"FMN aptamer", 2, (const char *[]){"AGGAUA","GAAGG"}, (int[]){0,0}, (int[]){6,5}, -60, _FMN, NULL},
+  {"FMN aptamer", 2, (const char *[]){"AGGAUAU","AGAAGG"}, (int[]){0,1}, (int[]){6,5}, -60, _FMN, 0.3, NULL, 0},
+  {"FMN aptamer", 2, (const char *[]){"AGGAUAN","NGAAGG"}, (int[]){0,1}, (int[]){6,5}, -60, _FMN, 3.0, NULL, 0},
   // .intrinsic estimated from R92 experimental results
-  {"TEP aptamer", 2, (const char *[]){"CCUUGGCAG","AUACCA"}, (int[]){0,0}, (int[]){9,6}, -300, _TEP, NULL},
+  {"TEP aptamer", 2, (const char *[]){"CCUUGGCAG","AUACCA"}, (int[]){0,0}, (int[]){9,6}, -300, _TEP, 0.32, NULL, 0},
   // meant for tests, no experimental data (so far) to support the .intrinsic value below
-  {"Sarcin-ricin (example)", 2, (const char*[]){"CCAGUA","GAACA"}, (int[]){0,0}, (int[]){6,5}, -250, _NONE, NULL}
+  {"Sarcin-ricin (example)", 2, (const char*[]){"CCAGUA","GAACA"}, (int[]){0,0}, (int[]){6,5}, -250, _NONE, 0., NULL, 0}
 };
 
 int num_motifs = sizeof(known_motifs) / sizeof(motif);
@@ -61,8 +62,6 @@ PUBLIC int set_ligand(ligand* lig_db, const char* lname, FLT_OR_DBL concentratio
     ligand* kli = lig_db+i;
     if (strcmp(lname, kli->name)!=0) continue;
     kli->conc = concentration;
-    kli->deltaG = 100. * (_RT * log(concentration / kli->Kd));
-    if (0) fprintf(stderr,"Ligand %s, dG %d dcal/mol\n", kli->name, kli->deltaG);
     return i;
   }
   return -1;
@@ -173,7 +172,9 @@ PUBLIC void detect_motifs(const char *sequence, motif* mdb, ligand* lig_db)
         }
         if (0) fprintf(stderr,"%s[%d] found at %d\n", kmi->name, j, ofs+1);
         add_list(kmi->occur[j], ofs+1 + kmi->s_ofs[j]);
-        if (kmi->lig_index >= 0) kmi->deltaG = lig_db[kmi->lig_index].deltaG;
+        if (kmi->lig_index >= 0 && lig_db[kmi->lig_index].conc > kmi->Kd) {
+          kmi->deltaG = 100. * (_RT * log( lig_db[kmi->lig_index].conc / kmi->Kd));
+        }
       }
     }
   }

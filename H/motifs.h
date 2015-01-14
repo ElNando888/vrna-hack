@@ -6,10 +6,8 @@
 typedef struct _ligand {
   /* static fields */
   const char *name;
-  FLT_OR_DBL Kd;
   /* runtime */
   FLT_OR_DBL conc;        /* in micromolars */ 
-  int        deltaG;      /* in dcal/mol    */
 } ligand;
 
 typedef struct _motif {
@@ -21,6 +19,7 @@ typedef struct _motif {
   int        *s_len;      /* for comparison in the callbacks */
   int        intrinsic;   /* in dcal/mol, estimated deviation from the model */
   int        lig_index;   /* which ligand, if any */
+  FLT_OR_DBL Kd;
   /* runtime */
   int        **occur;
   int        deltaG;      /* in dcal/mol */
