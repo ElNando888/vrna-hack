@@ -50,7 +50,6 @@ rna.ps
 *.0
 *.1
 RNAforester/g2-0.70/autom4te.cache/requests
-
 dot.ps
-
 ppp.txt
+UCT/*
