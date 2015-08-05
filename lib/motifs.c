@@ -23,7 +23,8 @@ typedef enum {false, true} bool;
 
 PRIVATE ligand known_ligands[] = {
   {"FMN", 0.},
-  {"TEP", 0.}
+  {"TEP", 0.},
+  {"MS2", 0.}
 };
 
 int num_ligands = sizeof(known_ligands) / sizeof(ligand);
@@ -31,6 +32,7 @@ int num_ligands = sizeof(known_ligands) / sizeof(ligand);
 enum {
   _FMN,
   _TEP,
+  _MS2,
   _NONE = -1
 };
 
@@ -41,8 +43,10 @@ PRIVATE motif  known_motifs[] = {
   {"FMN aptamer", 2, (const char *[]){"AGGAUAN","NGAAGG"}, (int[]){0,1}, (int[]){6,5}, -60, _FMN, 3.0, NULL, 0},
   // .intrinsic estimated from R92 experimental results
   {"TEP aptamer", 2, (const char *[]){"CCUUGGCAG","AUACCA"}, (int[]){0,0}, (int[]){9,6}, -300, _TEP, 0.32, NULL, 0},
+  // MS2
+  {"MS2 hairpin", 2, (const char *[]){"ACAUGAGGAUCACCCAUGU",NULL}, (int[]){5,14}, (int[]){1,0}, 0, _MS2, 0.017, NULL, 0},
   // meant for tests, no experimental data (so far) to support the .intrinsic value below
-  {"Sarcin-ricin (example)", 2, (const char*[]){"CCAGUA","GAACA"}, (int[]){0,0}, (int[]){6,5}, -250, _NONE, 0., NULL, 0}
+  // {"Sarcin-ricin (example)", 2, (const char*[]){"CCAGUA","GAACA"}, (int[]){0,0}, (int[]){6,5}, -250, _NONE, 0., NULL, 0}
 };
 
 int num_motifs = sizeof(known_motifs) / sizeof(motif);
@@ -161,6 +165,7 @@ PUBLIC void detect_motifs(const char *sequence, motif* mdb, ligand* lig_db)
     for (j = 0; j < kmi->num_segments; j++) {
       const char* p;
       const char* needle = kmi->segment[j];
+      if (needle == NULL) continue;
       for (p = iupac_match(sequence, needle); p; p = iupac_match(p+1, needle)) {
         int ofs = p - sequence;
         if (!ofs) continue;
@@ -174,6 +179,11 @@ PUBLIC void detect_motifs(const char *sequence, motif* mdb, ligand* lig_db)
         add_list(kmi->occur[j], ofs+1 + kmi->s_ofs[j]);
         if (kmi->lig_index >= 0 && lig_db[kmi->lig_index].conc > kmi->Kd) {
           kmi->deltaG = 100. * (_RT * log( lig_db[kmi->lig_index].conc / kmi->Kd));
+        }
+
+        // special case
+        if (j == 0 && kmi->num_segments == 2 && kmi->segment[1] == NULL) {
+          add_list(kmi->occur[1], ofs+1 + kmi->s_ofs[1]);
         }
       }
     }
