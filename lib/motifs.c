@@ -44,7 +44,7 @@ PRIVATE motif  known_motifs[] = {
   // .intrinsic estimated from R92 experimental results
   {"TEP aptamer", 2, (const char *[]){"CCUUGGCAG","AUACCA"}, (int[]){0,0}, (int[]){9,6}, -300, _TEP, 0.32, NULL, 0},
   // MS2
-  {"MS2 hairpin", 2, (const char *[]){"ACAUGAGGAUCACCCAUGU",NULL}, (int[]){5,14}, (int[]){1,0}, 0, _MS2, 0.017, NULL, 0},
+  {"MS2 hairpin", 2, (const char *[]){"ACAUGAGGAUCACCCAUGU",NULL}, (int[]){5,14}, (int[]){1,0}, 0, _MS2, 0.00256, NULL, 0},
   // meant for tests, no experimental data (so far) to support the .intrinsic value below
   // {"Sarcin-ricin (example)", 2, (const char*[]){"CCAGUA","GAACA"}, (int[]){0,0}, (int[]){6,5}, -250, _NONE, 0., NULL, 0}
 };
