@@ -104,12 +104,13 @@ PUBLIC void reset_motifs(motif* mdb)
 }
 
 
-PRIVATE void add_list(int* list, int val)
+PRIVATE int* add_list(int* list, int val)
 {
   int size = 1+list[0];
   list = realloc(list, (size+1)*sizeof(int));
   list[0]++;
   list[list[0]] = val;
+  return list;
 }
 
 
@@ -176,14 +177,14 @@ PUBLIC void detect_motifs(const char *sequence, motif* mdb, ligand* lig_db)
           }
         }
         if (0) fprintf(stderr,"%s[%d] found at %d\n", kmi->name, j, ofs+1);
-        add_list(kmi->occur[j], ofs+1 + kmi->s_ofs[j]);
+        kmi->occur[j] = add_list(kmi->occur[j], ofs+1 + kmi->s_ofs[j]);
         if (kmi->lig_index >= 0 && lig_db[kmi->lig_index].conc > kmi->Kd) {
           kmi->deltaG = 100. * (_RT * log( lig_db[kmi->lig_index].conc / kmi->Kd));
         }
 
         // special case
         if (j == 0 && kmi->num_segments == 2 && kmi->segment[1] == NULL) {
-          add_list(kmi->occur[1], ofs+1 + kmi->s_ofs[1]);
+          kmi->occur[1] = add_list(kmi->occur[1], ofs+1 + kmi->s_ofs[1]);
         }
       }
     }
