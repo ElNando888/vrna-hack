@@ -45,12 +45,12 @@ enum {
 /* TODO: retrieve these from a file */
 PRIVATE motif  known_motifs[] = {
   // .intrinsic estimated from R91 experimental results
-  {"FMN aptamer", 2, (const char *[]){"AGGAUAU","AGAAGG"}, (int[]){0,1}, (int[]){6,5}, -60, _FMN, 0.3, NULL, 0},
-  {"FMN aptamer", 2, (const char *[]){"AGGAUAN","NGAAGG"}, (int[]){0,1}, (int[]){6,5}, -60, _FMN, 3.0, NULL, 0},
+  {"FMN aptamer", 2, (const char *[]){"AGGAUAU","AGAAGG"}, (int[]){0,1}, (int[]){6,5}, -60, 0, _FMN, 0.3, NULL, 0},
+  {"FMN aptamer", 2, (const char *[]){"AGGAUAN","NGAAGG"}, (int[]){0,1}, (int[]){6,5}, -60, 0, _FMN, 3.0, NULL, 0},
   // .intrinsic estimated from R92 experimental results
-  {"TEP aptamer", 2, (const char *[]){"CCUUGGCAG","AUACCA"}, (int[]){0,0}, (int[]){9,6}, -300, _TEP, 0.32, NULL, 0},
+  {"TEP aptamer", 2, (const char *[]){"CCUUGGCAG","AUACCA"}, (int[]){0,0}, (int[]){9,6}, 0, -440, _TEP, 0.32, NULL, 0},
   // MS2
-  {"MS2 hairpin", 2, (const char *[]){"ACAUGAGGAUCACCCAUGU",NULL}, (int[]){5,14}, (int[]){1,0}, 0, _MS2, 0.00256, NULL, 0},
+  {"MS2 hairpin", 2, (const char *[]){"ACAUGAGGAUCACCCAUGU",NULL}, (int[]){5,14}, (int[]){1,0}, 0, 0, _MS2, 0.00256, NULL, 0},
   // FIXME: wrong Kd
   {"ARG aptamer", 2, (const char *[]){"GAAGGAGCG","CAGGUAGGUCGC"}, (int[]){1,1}, (int[]){7,10}, 0, -160, _ARG, 0.32, NULL, 0},
   // FIXME: wrong Kd
@@ -225,6 +225,7 @@ PRIVATE void std_eilcb(int* fe, int n1, int n2, int type, int type_2, int si1, i
         (*fe) += kmi->intrinsic;
         if (kmi->lig_index >= 0) {
           (*fe) += kmi->deltaG;
+          (*fe) += kmi->correction;
         }
         if (0) fprintf(stderr, "%s at %d+%d\n", kmi->name, ii, qq);
         return;
@@ -236,6 +237,7 @@ PRIVATE void std_eilcb(int* fe, int n1, int n2, int type, int type_2, int si1, i
         (*fe) += kmi->intrinsic;
         if (kmi->lig_index >= 0) {
           (*fe) += kmi->deltaG;
+          (*fe) += kmi->correction;
         }
         if (0) fprintf(stderr, "%s at %d+%d\n", kmi->name, qq, ii);
         return;
@@ -264,6 +266,7 @@ PRIVATE void std_eeilcb(double* fe, int u1, int u2, int type, int type2, short s
         (*fe) *= exp(-kmi->intrinsic*10./(P->kT));
         if (kmi->lig_index >= 0) {
           (*fe) *= exp(-kmi->deltaG*10./(P->kT));
+          (*fe) *= exp(-kmi->correction*10./(P->kT));
         }
         return;
       }
@@ -273,6 +276,7 @@ PRIVATE void std_eeilcb(double* fe, int u1, int u2, int type, int type2, short s
         (*fe) *= exp(-kmi->intrinsic*10./(P->kT));
         if (kmi->lig_index >= 0) {
           (*fe) *= exp(-kmi->deltaG*10./(P->kT));
+          (*fe) *= exp(-kmi->correction*10./(P->kT));
         }
         return;
       }

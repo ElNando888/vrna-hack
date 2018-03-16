@@ -18,6 +18,7 @@ typedef struct _motif {
   int        *s_ofs;      /* offset from th matched substring */
   int        *s_len;      /* for comparison in the callbacks */
   int        intrinsic;   /* in dcal/mol, estimated deviation from the model */
+  int        correction;  /* (...) */
   int        lig_index;   /* which ligand, if any */
   FLT_OR_DBL Kd;
   /* runtime */
