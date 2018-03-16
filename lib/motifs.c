@@ -24,7 +24,10 @@ typedef enum {false, true} bool;
 PRIVATE ligand known_ligands[] = {
   {"FMN", 0.},
   {"TEP", 0.},
-  {"MS2", 0.}
+  {"MS2", 0.},
+  {"ARG", 0.},
+  {"TRP", 0.},
+  {"ATP", 0.}
 };
 
 int num_ligands = sizeof(known_ligands) / sizeof(ligand);
@@ -33,6 +36,9 @@ enum {
   _FMN,
   _TEP,
   _MS2,
+  _ARG,
+  _TRP,
+  _ATP,
   _NONE = -1
 };
 
@@ -45,6 +51,13 @@ PRIVATE motif  known_motifs[] = {
   {"TEP aptamer", 2, (const char *[]){"CCUUGGCAG","AUACCA"}, (int[]){0,0}, (int[]){9,6}, -300, _TEP, 0.32, NULL, 0},
   // MS2
   {"MS2 hairpin", 2, (const char *[]){"ACAUGAGGAUCACCCAUGU",NULL}, (int[]){5,14}, (int[]){1,0}, 0, _MS2, 0.00256, NULL, 0},
+  // FIXME: wrong Kd
+  {"ARG aptamer", 2, (const char *[]){"GAAGGAGCG","CAGGUAGGUCGC"}, (int[]){1,1}, (int[]){7,10}, 0, -160, _ARG, 0.32, NULL, 0},
+  // FIXME: wrong Kd
+  {"TRP hairpin", 2, (const char *[]){"CGAGGACCGGUACGGCCGCCACUCG",NULL}, (int[]){4,18}, (int[]){3,3}, 0, 0, _TRP, 0.32, NULL, 0},
+  {"TRP aptamer", 2, (const char *[]){"CGGCCGCCACU","AGGACCGGG"}, (int[]){1,2}, (int[]){8,6}, 0, -400, _TRP, 0.32, NULL, 0},
+  // FIXME: wrong Kd
+  {"ATP aptamer", 2, (const char *[]){"GGGAAGAAACUGC","GGC"}, (int[]){1,1}, (int[]){11,1}, 0, 0, _ATP, 0.32, NULL, 0},
   // meant for tests, no experimental data (so far) to support the .intrinsic value below
   // {"Sarcin-ricin (example)", 2, (const char*[]){"CCAGUA","GAACA"}, (int[]){0,0}, (int[]){6,5}, -250, _NONE, 0., NULL, 0}
 };
